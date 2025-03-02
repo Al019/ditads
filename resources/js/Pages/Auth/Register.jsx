@@ -1,21 +1,37 @@
-import InputError from '@/Components/input-error';
-import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
-import TextInput from '@/Components/TextInput';
+import { Button } from "@/Components/ui/button"
+import {
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/Components/ui/input"
+import { Label } from "@/Components/ui/label"
+import { Link, useForm } from "@inertiajs/react"
+import {
+    Alert,
+    AlertDescription,
+} from "@/components/ui/alert"
+import { Separator } from "@/Components/ui/separator"
+import { InputPassword } from "@/Components/input-password"
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+    const { data, setData, post, processing, errors, reset, setError } = useForm({
+        last_name: '',
+        first_name: '',
         email: '',
         password: '',
         password_confirmation: '',
     });
 
-    const submit = (e) => {
+    const handleRegister = (e) => {
         e.preventDefault();
-
+        setError({
+            email: null,
+            password: null
+        })
         post(route('register'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
@@ -23,97 +39,70 @@ export default function Register() {
 
     return (
         <GuestLayout>
-            <Head title="Register" />
-
-            <form onSubmit={submit}>
-                <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
-                    <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
-                        className="mt-1 block w-full"
-                        autoComplete="name"
-                        isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.name} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="email" value="Email" />
-
-                    <TextInput
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="username"
-                        onChange={(e) => setData('email', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
-
-                    <TextInput
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) => setData('password', e.target.value)}
-                        required
-                    />
-
-                    <InputError message={errors.password} className="mt-2" />
-                </div>
-
-                <div className="mt-4">
-                    <InputLabel
-                        htmlFor="password_confirmation"
-                        value="Confirm Password"
-                    />
-
-                    <TextInput
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        value={data.password_confirmation}
-                        className="mt-1 block w-full"
-                        autoComplete="new-password"
-                        onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
-                        }
-                        required
-                    />
-
-                    <InputError
-                        message={errors.password_confirmation}
-                        className="mt-2"
-                    />
-                </div>
-
-                <div className="mt-4 flex items-center justify-end">
-                    <Link
-                        href={route('login')}
-                        className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
-                        Register
-                    </PrimaryButton>
-                </div>
+            <form onSubmit={handleRegister}>
+                <CardHeader>
+                    <CardTitle>Sign Up</CardTitle>
+                    <CardDescription>Please register an account.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {(errors.email || errors.password) && (
+                            <Alert variant="destructive">
+                                <AlertDescription>
+                                    {errors.email || errors.password}
+                                </AlertDescription>
+                            </Alert>
+                        )}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <Label>Last Name</Label>
+                                <Input value={data.last_name} onChange={(e) => setData('last_name', e.target.value)} required />
+                            </div>
+                            <div className="space-y-1">
+                                <Label>First Name</Label>
+                                <Input value={data.first_name} onChange={(e) => setData('first_name', e.target.value)} required />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <Label>Email Address</Label>
+                            <Input type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} required />
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <Label>Password</Label>
+                                <InputPassword value={data.password} onChange={(e) => setData('password', e.target.value)} required />
+                            </div>
+                            <div className="space-y-1">
+                                <Label>Confirm Password</Label>
+                                <InputPassword value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} required />
+                            </div>
+                        </div>
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <div className="w-full space-y-6">
+                        <Button className="w-full" disabled={processing}>
+                            Register
+                        </Button>
+                        <div className="flex gap-3 items-center justify-center">
+                            <div className="w-full">
+                                <Separator />
+                            </div>
+                            <Label>Or</Label>
+                            <div className="w-full">
+                                <Separator />
+                            </div>
+                        </div>
+                        <div className="grid space-y-1">
+                            <CardDescription className="text-center">Already have an account?</CardDescription>
+                            <Link href={route('login')} as="button" className="w-full">
+                                <Button type="button" className="w-full" variant="outline">
+                                    Sign In
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                </CardFooter>
             </form>
         </GuestLayout>
     );

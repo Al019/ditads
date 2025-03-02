@@ -16,6 +16,7 @@ import {
     AlertDescription,
 } from "@/components/ui/alert"
 import { InputPassword } from "@/Components/input-password"
+import { Separator } from "@/Components/ui/separator"
 
 export default function Login({ status, canResetPassword }) {
     const { data, setData, post, processing, errors, reset, setError } = useForm({
@@ -36,7 +37,7 @@ export default function Login({ status, canResetPassword }) {
         <GuestLayout>
             <form onSubmit={handleLogin}>
                 <CardHeader>
-                    <CardTitle>Login</CardTitle>
+                    <CardTitle>Sign In</CardTitle>
                     <CardDescription>Please login your account.</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -77,9 +78,28 @@ export default function Login({ status, canResetPassword }) {
                     </div>
                 </CardContent>
                 <CardFooter>
-                    <Button className="w-full" disabled={processing}>
-                        Sign In
-                    </Button>
+                    <div className="w-full space-y-6">
+                        <Button className="w-full" disabled={processing}>
+                            Login
+                        </Button>
+                        <div className="flex gap-3 items-center justify-center">
+                            <div className="w-full">
+                                <Separator />
+                            </div>
+                            <Label>Or</Label>
+                            <div className="w-full">
+                                <Separator />
+                            </div>
+                        </div>
+                        <div className="grid space-y-1">
+                            <CardDescription className="text-center">Don't have an account?</CardDescription>
+                            <Link href={route('register')} as="button" className="w-full">
+                                <Button type="button" className="w-full" variant="outline">
+                                    Sign Up
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
                 </CardFooter>
             </form>
         </GuestLayout>
