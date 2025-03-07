@@ -1,15 +1,7 @@
 import * as React from "react"
-import {
-  Layers,
-  LayoutDashboard,
-  Users,
-} from "lucide-react"
-
-import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
-  SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
@@ -19,38 +11,8 @@ import {
 } from "@/components/ui/sidebar"
 import { Link, usePage } from "@inertiajs/react"
 import Logo from '../../../public/images/logo.png'
-import { NavSurvey } from "./nav-survey"
-
-const navMain = {
-  title: "Dashboard",
-  route: "admin.dashboard",
-  icon: LayoutDashboard,
-  url: "/admin/dashboard",
-  users: {
-    title: "Users",
-    icon: Users,
-    url: "/admin/users",
-    subItems: [
-      {
-        title: "Enumerators",
-        route: "admin.user.enumerator",
-        url: "/admin/users/enumerators",
-      },
-      {
-        title: "Viewers",
-        route: "admin.user.viewer",
-        url: "/admin/users/viewers",
-      },
-    ],
-  },
-}
-
-const navSurvey = {
-  title: "Surveys",
-  route: "admin.survey",
-  icon: Layers,
-  url: "/admin/surveys",
-}
+import { NavAdmin } from "./nav-admin"
+import { NavEnumerator } from "./nav-enumerator"
 
 export function AppSidebar({
   ...props
@@ -82,10 +44,12 @@ export function AppSidebar({
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={navMain} />
-        <NavSurvey items={navSurvey} />
-      </SidebarContent>
+      {user.role === 'admin' && (
+        <NavAdmin />
+      )}
+      {user.role === 'enumerator' && (
+        <NavEnumerator />
+      )}
       <SidebarFooter>
         <NavUser user={user} />
       </SidebarFooter>

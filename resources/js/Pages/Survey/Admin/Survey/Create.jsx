@@ -25,6 +25,7 @@ import { createRef, forwardRef, useEffect, useRef, useState } from "react"
 import axios from "axios"
 import { toast } from "sonner"
 import { router } from "@inertiajs/react"
+import { Separator } from "@/Components/ui/separator"
 
 const tabs = ["Questions", "Settings"]
 
@@ -150,13 +151,20 @@ const Create = () => {
     setSurvey({ ...survey, questions: updatedQuestions })
   }
 
+  const handleToggleRequired = (checked) => {
+    setSurvey((prev) => ({
+      ...prev,
+      questions: prev.questions.map((q) => ({ ...q, required: checked ? 1 : 0 })),
+    }))
+  }
+
   const handlePublish = async () => {
     setProcessing(true)
-    await axios.post(route('admin.survey.publish'), survey)
+    await axios.post(route('api.admin.survey.publish'), survey)
       .then(() => {
         router.visit(route('admin.survey'))
         toast.success("Survey created successfully.")
-        localStorage.clear("create-survey")
+        localStorage.removeItem("create-survey")
       })
       .catch((error) => {
         if (error.response) {
@@ -173,16 +181,16 @@ const Create = () => {
   }
 
   return (
-    <AuthenticatedLayout title={survey.title} button={
-      activeTab === "Questions" && (
-        <Button onClick={handlePublish} disabled={processing}>
-          <Loader2 className={`animate-spin ${!processing ? 'hidden' : ''}`} />
-          Publish
-        </Button>
-      )
-    }>
-      <Tabs defaultValue={activeTab}>
-        <div className="flex justify-center mb-4">
+    <Tabs defaultValue={activeTab}>
+      <AuthenticatedLayout title={survey.title} button={
+        activeTab === "Questions" && (
+          <Button onClick={handlePublish} disabled={processing}>
+            <Loader2 className={`animate-spin ${!processing ? 'hidden' : ''}`} />
+            Publish
+          </Button>
+        )
+      } tab={
+        <div className="flex justify-center mb-2">
           <TabsList>
             {tabs.map((tab, index) => (
               <TabsTrigger key={index} value={tab} onClick={() => setActiveTab(tab)}>
@@ -191,6 +199,7 @@ const Create = () => {
             ))}
           </TabsList>
         </div>
+      }>
         <TabsContent value="Questions">
           <div className="max-w-[800px] mx-auto space-y-4 mb-40">
             <Card onClick={() => setSelected(0)} className={selected === 0 ? 'ring-2 ring-green-500' : ''}>
@@ -303,10 +312,26 @@ const Create = () => {
           </div>
         </TabsContent>
         <TabsContent value="Settings">
-
+          <div className="max-w-[800px] mx-auto space-y-4">
+            <Card>
+              <CardHeader>
+                <h1 className="font-medium">Manage Survey</h1>
+              </CardHeader>
+              <CardContent>
+                <Separator className="mb-4" />
+                <div className="flex justify-between items-center">
+                  <div className="space-y-1">
+                    <h1 className="font-normal text-sm">Required</h1>
+                    <p className="text-xs font-normal">All questions are required.</p>
+                  </div>
+                  <Switch checked={survey.questions.every(q => q.required === 1)} onCheckedChange={(val) => handleToggleRequired(val)} />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
-      </Tabs>
-    </AuthenticatedLayout>
+      </AuthenticatedLayout>
+    </Tabs>
   )
 }
 

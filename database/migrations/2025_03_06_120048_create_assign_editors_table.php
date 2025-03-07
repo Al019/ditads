@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('survey_assignments', function (Blueprint $table) {
+        Schema::create('assign_editors', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('survey_id')->constrained('surveys')->cascadeOnDelete();
-            $table->foreignId('enumerator_id')->constrained('users');
+            $table->foreignId('request_id')->constrained('requests');
+            $table->foreignId('editor_id')->constrained('users');
+            $table->string('edited_file')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('survey_assignments');
+        Schema::dropIfExists('assign_editors');
     }
 };

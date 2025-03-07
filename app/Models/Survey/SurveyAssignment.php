@@ -16,7 +16,6 @@ class SurveyAssignment extends Model
     protected $fillable = [
         'survey_id',
         'enumerator_id',
-        'target',
     ];
 
     public function user(): BelongsTo

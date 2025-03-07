@@ -28,9 +28,7 @@ export default function Login({ status, canResetPassword }) {
     const handleLogin = (e) => {
         e.preventDefault();
         setError({ email: null })
-        post(route('login'), {
-            onFinish: () => reset('password'),
-        });
+        post(route('login'));
     };
 
     return (

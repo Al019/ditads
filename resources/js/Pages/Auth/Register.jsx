@@ -32,9 +32,7 @@ export default function Register() {
             email: null,
             password: null
         })
-        post(route('register'), {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });
+        post(route('register'));
     };
 
     return (

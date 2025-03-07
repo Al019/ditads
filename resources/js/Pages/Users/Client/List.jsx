@@ -1,6 +1,6 @@
-import { Button } from "@/Components/ui/button"
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
 import { useEffect, useRef, useState } from 'react'
+import { Input } from '@/Components/ui/input'
 import { router, usePage } from "@inertiajs/react";
 import {
   Table,
@@ -17,12 +17,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { Input } from "@/Components/ui/input";
+import { Badge } from "@/components/ui/badge"
 
 const List = () => {
-  const { surveys } = usePage().props
+  const { clients } = usePage().props
   const [search, setSearch] = useState("");
-  const formatDateTime = (date) => new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" })
 
   const searchTimeoutRef = useRef(null);
 
@@ -35,7 +34,7 @@ const List = () => {
     }
 
     searchTimeoutRef.current = setTimeout(() => {
-      router.get(route('admin.survey'), { search: value }, { preserveState: true });
+      router.get(route('admin.user.client'), { search: value }, { preserveState: true });
     }, 1000);
   };
 
@@ -52,11 +51,7 @@ const List = () => {
   }
 
   return (
-    <AuthenticatedLayout title="Surveys" button={
-      <Button onClick={() => router.get(route('admin.survey.create'))}>
-        Create
-      </Button>
-    }>
+    <AuthenticatedLayout title="Clients">
       <div className='space-y-4'>
         <div className='w-full sm:max-w-xs'>
           <Input value={search} onChange={handleSearch} placeholder="Search" />
@@ -65,30 +60,32 @@ const List = () => {
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Assign Enumerators</TableHead>
-              <TableHead>Total Responses</TableHead>
-              <TableHead>Date Created</TableHead>
+              <TableHead>Last Name</TableHead>
+              <TableHead>First Name</TableHead>
+              <TableHead>Email Address</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {surveys.data.length > 0 ? (
-              surveys.data.map((survey, index) => (
-                <TableRow key={index} onClick={() => router.visit(route('admin.survey.view', { survey_id: survey.id }))} className="cursor-pointer">
+            {clients.data.length > 0 ? (
+              clients.data.map((client, index) => (
+                <TableRow key={index}>
                   <TableCell className="font-medium">
                     {index + 1}
                   </TableCell>
                   <TableCell>
-                    {survey.title}
+                    {client.last_name}
                   </TableCell>
                   <TableCell>
-                    {survey.survey_assignment_count}
+                    {client.first_name}
                   </TableCell>
                   <TableCell>
-                    {survey.response_count}
+                    {client.email}
                   </TableCell>
                   <TableCell>
-                    {formatDateTime(survey.created_at)}
+                    <Badge variant={client.status === 'active' ? 'default' : 'destructive'}>
+                      <span className='capitalize'>{client.status}</span>
+                    </Badge>
                   </TableCell>
                 </TableRow>
               ))
@@ -101,16 +98,16 @@ const List = () => {
             )}
           </TableBody>
         </Table>
-        {surveys.data.length > 0 && (
+        {clients.data.length > 0 && (
           <div className='flex justify-end'>
             <div>
               <Pagination>
                 <PaginationContent>
                   <PaginationItem>
-                    <PaginationPrevious onClick={() => handlePage(surveys.prev_page_url)} className="cursor-pointer" />
+                    <PaginationPrevious onClick={() => handlePage(clients.prev_page_url)} className="cursor-pointer" />
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationNext onClick={() => handlePage(surveys.next_page_url)} className="cursor-pointer" />
+                    <PaginationNext onClick={() => handlePage(clients.next_page_url)} className="cursor-pointer" />
                   </PaginationItem>
                 </PaginationContent>
               </Pagination>

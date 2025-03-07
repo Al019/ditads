@@ -22,7 +22,6 @@ import { Input } from "@/Components/ui/input";
 const List = () => {
   const { surveys } = usePage().props
   const [search, setSearch] = useState("");
-  const formatDateTime = (date) => new Date(date).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "numeric" })
 
   const searchTimeoutRef = useRef(null);
 
@@ -35,7 +34,7 @@ const List = () => {
     }
 
     searchTimeoutRef.current = setTimeout(() => {
-      router.get(route('admin.survey'), { search: value }, { preserveState: true });
+      router.get(route('enumerator.survey'), { search: value }, { preserveState: true });
     }, 1000);
   };
 
@@ -52,11 +51,7 @@ const List = () => {
   }
 
   return (
-    <AuthenticatedLayout title="Surveys" button={
-      <Button onClick={() => router.get(route('admin.survey.create'))}>
-        Create
-      </Button>
-    }>
+    <AuthenticatedLayout title="Surveys">
       <div className='space-y-4'>
         <div className='w-full sm:max-w-xs'>
           <Input value={search} onChange={handleSearch} placeholder="Search" />
@@ -66,15 +61,14 @@ const List = () => {
             <TableRow>
               <TableHead>#</TableHead>
               <TableHead>Title</TableHead>
-              <TableHead>Assign Enumerators</TableHead>
+              <TableHead>Responses</TableHead>
               <TableHead>Total Responses</TableHead>
-              <TableHead>Date Created</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {surveys.data.length > 0 ? (
               surveys.data.map((survey, index) => (
-                <TableRow key={index} onClick={() => router.visit(route('admin.survey.view', { survey_id: survey.id }))} className="cursor-pointer">
+                <TableRow key={index} onClick={() => router.visit(route('enumerator.survey.view', { survey_id: survey.id }))} className="cursor-pointer">
                   <TableCell className="font-medium">
                     {index + 1}
                   </TableCell>
@@ -82,13 +76,10 @@ const List = () => {
                     {survey.title}
                   </TableCell>
                   <TableCell>
-                    {survey.survey_assignment_count}
+                    {survey.enumerator_response_count}
                   </TableCell>
                   <TableCell>
-                    {survey.response_count}
-                  </TableCell>
-                  <TableCell>
-                    {formatDateTime(survey.created_at)}
+                    {survey.total_response_count}
                   </TableCell>
                 </TableRow>
               ))

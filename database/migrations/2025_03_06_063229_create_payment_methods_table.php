@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('survey_assignments', function (Blueprint $table) {
+        Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('survey_id')->constrained('surveys')->cascadeOnDelete();
-            $table->foreignId('enumerator_id')->constrained('users');
+            $table->string('name');
+            $table->string('account_name')->nullable();
+            $table->string('account_number')->nullable();
+            $table->enum('type', ['cash', 'e-wallet']);
+            $table->integer('status')->default(1);
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('survey_assignments');
+        Schema::dropIfExists('payment_methods');
     }
 };

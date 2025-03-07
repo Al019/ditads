@@ -23,9 +23,9 @@ return new class extends Migration
             $table->string('contact_number')->nullable();
             $table->string('course')->nullable();
             $table->string('school')->nullable();
-            $table->string('school_type')->nullable();
-            $table->string('role')->default('client');
-            $table->string('status')->default('active');
+            $table->enum('school_type', ['public', 'private'])->nullable();
+            $table->enum('role', ['admin', 'enumerator', 'viewer', 'editor', 'client'])->default('client');
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->integer('is_default')->default(0);
             $table->rememberToken();
             $table->timestamps();
