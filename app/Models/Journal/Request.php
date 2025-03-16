@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Request extends Model
 {
@@ -14,7 +15,10 @@ class Request extends Model
     protected $fillable = [
         'client_id',
         'service_id',
-        'upload_file',
+        'request_number',
+        'uploaded_file',
+        'amount',
+        'message',
         'status',
     ];
 
@@ -28,13 +32,13 @@ class Request extends Model
         return $this->belongsTo(Service::class, 'service_id');
     }
 
-    public function payment(): HasMany
+    public function payment(): HasOne
     {
-        return $this->hasMany(Payment::class, 'request_id');
+        return $this->hasOne(Payment::class, 'request_id');
     }
 
-    public function assign_editor(): HasMany
+    public function assign_editor(): HasOne
     {
-        return $this->hasMany(AssignEditor::class, 'request_id');
+        return $this->hasOne(AssignEditor::class, 'request_id');
     }
 }

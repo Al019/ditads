@@ -15,7 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('client_id')->constrained('users');
             $table->foreignId('service_id')->constrained('services');
-            $table->string('upload_file');
+            $table->string('request_number');
+            $table->string('uploaded_file');
+            $table->decimal('amount');
+            $table->longText('message')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });

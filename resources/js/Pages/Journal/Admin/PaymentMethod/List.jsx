@@ -29,7 +29,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Switch } from "@/Components/ui/switch";
-import { FileImage, FilePenLine } from "lucide-react";
+import { FileImage, FilePenLine, QrCode, Settings2, Upload } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -39,29 +39,34 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Badge } from "@/Components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const List = () => {
   const [open, setOpen] = useState(false)
-  const { data, setData, post, patch, processing, errors, reset, setError } = useForm({
+  const { data, setData, post, processing, errors, reset, setError } = useForm({
     name: "",
     account_name: "",
     account_number: "",
-    type: "",
+    qr_code: null,
+    have_qr: "no"
   })
   const { payments } = usePage().props
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState(() => [...payments.data])
   const [editData, setEditData] = useState(false)
+  const [previewQr, setPreviewQr] = useState(null)
+  const [status, setStatus] = useState(() => [...payments.data])
 
   useEffect(() => {
     setStatus([...payments.data])
   }, [payments])
-
-  useEffect(() => {
-    if (!editData) {
-      setData("name", data.type === "cash" ? "Cash" : "")
-    }
-  }, [data.type, editData])
 
   const handleOpen = (payment = null) => {
     if (payment) {
@@ -71,21 +76,27 @@ const List = () => {
         name: payment.name,
         account_name: payment.account_name,
         account_number: payment.account_number,
-        type: payment.type
+        qr_code: payment.qr_code,
+        have_qr: payment.qr_code ? 'yes' : 'no'
       })
+      if (payment.qr_code) {
+        setPreviewQr(`/storage/journal/qr_codes/${payment.qr_code}`)
+      } else {
+        setPreviewQr(null);
+      }
     } else {
       setEditData(false)
       reset()
+      setPreviewQr(null)
     }
     setOpen(!open)
-    setError({ name: null, account_name: null, account_number: null })
+    setError({ name: null, account_name: null, account_number: null, qr_code: null })
   }
 
   const handleAdd = () => {
-    setError({ name: null, account_name: null, account_number: null })
+    setError({ name: null, account_name: null, account_number: null, qr_code: null })
     post(route('admin.service&payment.add.payment.method'), {
       onSuccess: () => {
-        reset()
         handleOpen()
         toast.success("Payment method added successfully.")
       },
@@ -93,12 +104,9 @@ const List = () => {
   }
 
   const handleUpdate = () => {
-    if (!editData) return;
-
-    setError({ name: null, account_name: null, account_number: null })
-    patch(route("admin.service&payment.update.payment.method"), {
+    setError({ name: null, account_name: null, account_number: null, qr_code: null })
+    post(route("admin.service&payment.update.payment.method"), {
       onSuccess: () => {
-        reset()
         handleOpen()
         toast.success("Payment method updated successfully.");
       }, preserveScroll: true
@@ -106,7 +114,7 @@ const List = () => {
   };
 
   const handleToggle = (id, currentStatus) => {
-    const newStatus = currentStatus === 1 ? 2 : 1
+    const newStatus = currentStatus === 1 ? 0 : 1
 
     setStatus((prev) =>
       prev.map((payment) =>
@@ -114,7 +122,7 @@ const List = () => {
       )
     )
 
-    router.patch(route('admin.service&payment.update.payment.method.status'), { id, status: newStatus }, { preserveScroll: true })
+    router.post(route('admin.service&payment.update.payment.method.status'), { id, status: newStatus }, { preserveScroll: true })
   }
 
   const searchTimeoutRef = useRef(null);
@@ -176,10 +184,10 @@ const List = () => {
                     {payment.name}
                   </TableCell>
                   <TableCell>
-                    {payment.account_name === null ? '-' : payment.account_name}
+                    {payment.account_name}
                   </TableCell>
                   <TableCell>
-                    {payment.account_number === null ? '-' : payment.account_number}
+                    {payment.account_number}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
@@ -189,14 +197,24 @@ const List = () => {
                         onCheckedChange={() => handleToggle(payment.id, payment.status)}
                       />
                       <Label htmlFor={`status-${index}`}>
-                        {status[index]?.status === 1 ? "Available" : "Not available"}
+                        {status[index]?.status === 1 ? "Available" : "Unavailable"}
                       </Label>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Button onClick={() => handleOpen(payment)} variant="outline" size="icon">
-                      <FilePenLine />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <Settings2 />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleOpen(payment)} className="cursor-pointer">
+                          <FilePenLine />Edit Payment Method
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -228,55 +246,86 @@ const List = () => {
       </div>
 
       <Dialog open={open} onOpenChange={() => handleOpen()}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="max-h-full overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editData ? "Edit Payment Method" : "Add Payment Method"}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="space-y-1">
-              <Label>Type</Label>
-              <Select value={data.type} onValueChange={(val) => {
-                setData("type", val)
-                setError({ name: null, account_name: null, account_number: null })
-              }}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="e-wallet">E-Wallet</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              {data.type === 'cash' && <InputError message={errors.name} />}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label>Name</Label>
+                <Input value={data.name} onChange={(e) => setData('name', e.target.value)} />
+                <InputError message={errors.name} />
+              </div>
+              <div className="space-y-1">
+                <Label>Have a QR Code?</Label>
+                <Select value={data.have_qr} onValueChange={(val) => setData('have_qr', val)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="yes">Yes</SelectItem>
+                      <SelectItem value="no">No</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label>Account Name</Label>
+                <Input value={data.account_name} onChange={(e) => setData('account_name', e.target.value)} />
+                <InputError message={errors.account_name} />
+              </div>
+              <div className="space-y-1">
+                <Label>Account Number</Label>
+                <Input type="number" value={data.account_number} onChange={(e) => setData('account_number', e.target.value)} />
+                <InputError message={errors.account_number} />
+              </div>
             </div>
-            {data.type === 'e-wallet' && (
+            {data.have_qr === 'yes' && (
               <>
                 <div className="space-y-1">
-                  <Label>Name</Label>
-                  <Input value={data.name} onChange={(e) => setData('name', e.target.value)} />
-                  <InputError message={errors.name} />
+                  <div className=" flex items-center space-x-4 rounded-md border p-4">
+                    <QrCode />
+                    <div className="flex-1">
+                      {data.qr_code ? (
+                        <p className="text-sm font-medium leading-none">
+                          {data.qr_code.name || data.qr_code}
+                        </p>
+                      ) : (
+                        <p className="text-sm font-medium leading-none">
+                          No file chosen
+                        </p>
+                      )}
+                    </div>
+                    <Button onClick={() => document.getElementById("qr_code").click()} size="icon" variant="ghost">
+                      <Upload />
+                    </Button>
+                  </div>
+                  <input accept=".jpg,.jpeg,.png" id="qr_code" type="file" onChange={(e) => {
+                    const file = e.target.files[0];
+                    setData('qr_code', file)
+                    if (file) {
+                      const imageUrl = URL.createObjectURL(file);
+                      setPreviewQr(imageUrl);
+                    } else {
+                      setPreviewQr(null)
+                    }
+                  }} hidden />
+                  <InputError message={errors.qr_code} />
                 </div>
-                <div className="space-y-1">
-                  <Label>Account Name</Label>
-                  <Input value={data.account_name} onChange={(e) => setData('account_name', e.target.value)} />
-                  <InputError message={errors.account_name} />
-                </div>
-                <div className="space-y-1">
-                  <Label>Account Number</Label>
-                  <Input type="number" value={data.account_number} onChange={(e) => setData('account_number', e.target.value)} />
-                  <InputError message={errors.account_number} />
-                </div>
+                {previewQr && (
+                  <div className="max-w-[250px] mx-auto h-[300px]">
+                    <img src={previewQr} className="object-contain h-full w-full" />
+                  </div>
+                )}
               </>
             )}
           </div>
           <DialogFooter>
-            {data.type && (
-              <Button onClick={editData ? handleUpdate : handleAdd} disabled={processing}>
-                {editData ? 'Update' : 'Save'}
-              </Button>
-            )}
+            <Button onClick={editData ? handleUpdate : handleAdd} disabled={processing}>
+              {editData ? 'Update' : 'Save'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

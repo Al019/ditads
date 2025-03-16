@@ -165,7 +165,7 @@ const List = () => {
       </div>
 
       <Dialog open={open} onOpenChange={handleOpen}>
-        <DialogContent className="sm:max-w-xl">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Add Enumerator</DialogTitle>
           </DialogHeader>

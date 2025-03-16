@@ -26,7 +26,7 @@ return new class extends Migration
             $table->enum('school_type', ['public', 'private'])->nullable();
             $table->enum('role', ['admin', 'enumerator', 'viewer', 'editor', 'client'])->default('client');
             $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->integer('is_default')->default(0);
+            $table->boolean('is_default')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

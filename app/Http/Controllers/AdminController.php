@@ -59,7 +59,7 @@ class AdminController extends Controller
             'role' => 'enumerator',
         ]);
 
-        Mail::to($request->email)->send(new PasswordMail($password));
+        Mail::to($request->email)->send(new PasswordMail($password, $request->first_name . ' ' . $request->last_name));
     }
 
     public function getViewer(Request $request)
@@ -103,6 +103,8 @@ class AdminController extends Controller
             'password' => Hash::make($password),
             'role' => 'viewer',
         ]);
+
+        Mail::to($request->email)->send(new PasswordMail($password, $request->first_name . ' ' . $request->last_name));
     }
 
     public function getEditor(Request $request)
@@ -146,6 +148,8 @@ class AdminController extends Controller
             'password' => Hash::make($password),
             'role' => 'editor',
         ]);
+
+        Mail::to($request->email)->send(new PasswordMail($password, $request->first_name . ' ' . $request->last_name));
     }
 
     public function getClient(Request $request)

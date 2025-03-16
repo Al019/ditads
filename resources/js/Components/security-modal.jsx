@@ -1,14 +1,12 @@
 import { router } from '@inertiajs/react';
 import { createContext, useContext, useState } from 'react';
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Lock } from 'lucide-react';
 import { Button } from './ui/button';
 
@@ -22,22 +20,24 @@ export const SecurityProvider = ({ children }) => {
   return (
     <SecurityModal.Provider value={{ setOpen }}>
       {children}
-      <Dialog open={open}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-center">Security Alert</DialogTitle>
-          </DialogHeader>
-          <div className='flex flex-col gap-4 items-center'>
-            <Lock size={80} className='text-destructive' />
-            <DialogDescription>
-              Please change your password!
-            </DialogDescription>
-            <Button onClick={() => router.visit(route('profile.information'))} className="w-full">
-              Change Password
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AlertDialog open={open}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-center">
+              Security Alert
+            </AlertDialogTitle>
+            <div className='flex flex-col gap-4 items-center'>
+              <Lock size={80} className='text-destructive' />
+              <AlertDialogDescription>
+                Please change your password!
+              </AlertDialogDescription>
+              <Button onClick={() => router.visit(route('profile.information'))} className="w-full">
+                Change Password
+              </Button>
+            </div>
+          </AlertDialogHeader>
+        </AlertDialogContent>
+      </AlertDialog>
     </SecurityModal.Provider>
   );
 };

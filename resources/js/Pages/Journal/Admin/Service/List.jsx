@@ -29,11 +29,19 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Switch } from "@/Components/ui/switch";
-import { FilePenLine } from "lucide-react";
+import { FilePenLine, Settings2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const List = () => {
   const [open, setOpen] = useState(false)
-  const { data, setData, post, patch, processing, errors, reset, setError } = useForm({
+  const { data, setData, post, processing, errors, reset, setError } = useForm({
     name: "",
     price: "",
   })
@@ -41,6 +49,10 @@ const List = () => {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState(() => [...services.data])
   const [editData, setEditData] = useState(false)
+  const formatCurrency = (amount) => new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "PHP",
+  }).format(parseFloat(amount))
 
   useEffect(() => {
     setStatus([...services.data])
@@ -66,7 +78,6 @@ const List = () => {
     setError({ name: null, price: null })
     post(route('admin.service&payment.add.service'), {
       onSuccess: () => {
-        reset()
         handleOpen()
         toast.success("Service added successfully.")
       },
@@ -74,12 +85,9 @@ const List = () => {
   }
 
   const handleUpdate = () => {
-    if (!editData) return;
-
     setError({ name: null, price: null });
-    patch(route("admin.service&payment.update.service"), {
+    post(route("admin.service&payment.update.service"), {
       onSuccess: () => {
-        reset()
         handleOpen()
         toast.success("Service updated successfully.");
       }, preserveScroll: true
@@ -87,7 +95,7 @@ const List = () => {
   };
 
   const handleToggle = (id, currentStatus) => {
-    const newStatus = currentStatus === 1 ? 2 : 1
+    const newStatus = currentStatus === 1 ? 0 : 1
 
     setStatus((prev) =>
       prev.map((service) =>
@@ -95,7 +103,7 @@ const List = () => {
       )
     )
 
-    router.patch(route('admin.service&payment.update.service.status'), { id, status: newStatus }, { preserveScroll: true })
+    router.post(route('admin.service&payment.update.service.status'), { id, status: newStatus }, { preserveScroll: true })
   }
 
   const searchTimeoutRef = useRef(null);
@@ -156,7 +164,7 @@ const List = () => {
                     {service.name}
                   </TableCell>
                   <TableCell>
-                    {service.price}
+                    {formatCurrency(service.price)}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
@@ -166,14 +174,24 @@ const List = () => {
                         onCheckedChange={() => handleToggle(service.id, service.status)}
                       />
                       <Label htmlFor={`status-${index}`}>
-                        {status[index]?.status === 1 ? "Available" : "Not available"}
+                        {status[index]?.status === 1 ? "Available" : "Unavailable"}
                       </Label>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Button onClick={() => handleOpen(service)} variant="outline" size="icon">
-                      <FilePenLine />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <Settings2 />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleOpen(service)} className="cursor-pointer">
+                          <FilePenLine />Edit Service
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -205,7 +223,7 @@ const List = () => {
       </div>
 
       <Dialog open={open} onOpenChange={() => handleOpen()}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{editData ? "Edit Service" : "Add Service"}</DialogTitle>
           </DialogHeader>

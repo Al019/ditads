@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('request_id')->constrained('requests');
             $table->foreignId('payment_method_id')->constrained('payment_methods');
-            $table->string('amount');
             $table->string('reference_number');
+            $table->string('receipt')->nullable();
+            $table->longText('message')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });

@@ -10,6 +10,7 @@ use App\Models\Survey\SurveyAssignment;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -86,8 +87,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Request::class, 'client_id');
     }
 
-    public function assign_editor(): HasMany
+    public function assign_editor(): HasOne
     {
-        return $this->hasMany(AssignEditor::class, 'editor_id');
+        return $this->hasOne(AssignEditor::class, 'editor_id');
     }
 }

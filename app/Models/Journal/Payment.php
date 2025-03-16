@@ -12,8 +12,9 @@ class Payment extends Model
     protected $fillable = [
         'request_id',
         'payment_method_id',
-        'amount',
         'reference_number',
+        'receipt',
+        'message',
         'status',
     ];
 

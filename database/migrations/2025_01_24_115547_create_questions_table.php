@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('survey_id')->constrained('surveys')->cascadeOnDelete();
             $table->longText('text');
-            $table->string('type');
-            $table->integer('required');
+            $table->enum('type', ['radio', 'checkbox', 'select', 'input']);
+            $table->boolean('required');
             $table->timestamps();
         });
     }

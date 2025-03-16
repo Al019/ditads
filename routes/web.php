@@ -13,6 +13,10 @@ Route::get('/', function () {
         return redirect(route('enumerator.dashboard'));
     } else if (Auth::user()->role === 'viewer') {
         return redirect(route('viewer.dashboard'));
+    } else if (Auth::user()->role === 'editor') {
+        return redirect(route('editor.dashboard'));
+    } else if (Auth::user()->role === 'client') {
+        return redirect(route('client.dashboard'));
     } else {
         return abort(403);
     }

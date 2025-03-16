@@ -14,14 +14,36 @@ class VerifyEmailController extends Controller
      */
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
+        $role = $request->user()->role;
+
         if ($request->user()->hasVerifiedEmail()) {
-            return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
+            if ($role === "enumerator") {
+                return redirect()->intended(route('enumerator.dashboard', absolute: false));
+            } else if ($role === "viewer") {
+                return redirect()->intended(route('viewer.dashboard', absolute: false));
+            } else if ($role === "editor") {
+                return redirect()->intended(route('editor.dashboard', absolute: false));
+            } else if ($role === "client") {
+                return redirect()->intended(route('client.dashboard', absolute: false));
+            }
+
+            return redirect()->intended(route('admin.dashboard', absolute: false));
         }
 
         if ($request->user()->markEmailAsVerified()) {
             event(new Verified($request->user()));
         }
 
-        return redirect()->intended(route('dashboard', absolute: false).'?verified=1');
+        if ($role === "enumerator") {
+            return redirect()->intended(route('enumerator.dashboard', absolute: false));
+        } else if ($role === "viewer") {
+            return redirect()->intended(route('viewer.dashboard', absolute: false));
+        } else if ($role === "editor") {
+            return redirect()->intended(route('editor.dashboard', absolute: false));
+        } else if ($role === "client") {
+            return redirect()->intended(route('client.dashboard', absolute: false));
+        }
+
+        return redirect()->intended(route('admin.dashboard', absolute: false));
     }
 }

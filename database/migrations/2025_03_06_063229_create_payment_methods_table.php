@@ -16,8 +16,9 @@ return new class extends Migration
             $table->string('name');
             $table->string('account_name')->nullable();
             $table->string('account_number')->nullable();
-            $table->enum('type', ['cash', 'e-wallet']);
-            $table->integer('status')->default(1);
+            $table->string('qr_code')->nullable();
+            $table->enum('type', ['cash', 'e-wallet'])->default('e-wallet');
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

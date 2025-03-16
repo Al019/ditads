@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('price');
-            $table->integer('status')->default(1);
+            $table->decimal('price');
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

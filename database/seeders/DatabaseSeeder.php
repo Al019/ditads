@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Journal\PaymentMethod;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Hash;
@@ -24,6 +25,12 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin',
             'status' => 'active',
             'is_default' => 0,
+        ]);
+
+        PaymentMethod::factory()->create([
+            'name' => 'Cash',
+            'type' => 'cash',
+            'status' => 1,
         ]);
     }
 }

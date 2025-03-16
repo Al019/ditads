@@ -24,7 +24,8 @@ const Information = () => {
     password_confirmation: '',
   });
 
-  const handleSave = () => {
+  const handleSave = (e) => {
+    e.preventDefault()
     setError({ current_password: null, password: null, password_confirmation: null })
     post(route('profile.change.password'), {
       onSuccess: () => {
@@ -36,13 +37,7 @@ const Information = () => {
 
   return (
     <Tabs defaultValue={activeTab}>
-      <AuthenticatedLayout title="My Profile" button={
-        activeTab === "Change Password" && (
-          <Button onClick={handleSave} disabled={processing}>
-            Save Changes
-          </Button>
-        )
-      } tab={
+      <AuthenticatedLayout title="My Profile" tab={
         <div className="flex justify-start mb-2">
           <TabsList>
             {tabs.map((tab, index) => (
@@ -124,31 +119,38 @@ const Information = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {user.is_default === 1 && (
+                <form onSubmit={handleSave}>
+                  <div className="space-y-4">
+                    {user.is_default === 1 && (
+                      <div className="grid grid-cols-2">
+                        <div className="space-y-1">
+                          <Label>Current Password</Label>
+                          <InputPassword value={data.current_password} onChange={(e) => setData('current_password', e.target.value)} />
+                          <InputError message={errors.current_password} />
+                        </div>
+                      </div>
+                    )}
                     <div className="grid grid-cols-2">
                       <div className="space-y-1">
-                        <Label>Current Password</Label>
-                        <InputPassword value={data.current_password} onChange={(e) => setData('current_password', e.target.value)} />
-                        <InputError message={errors.current_password} />
+                        <Label>New Password</Label>
+                        <InputPassword value={data.password} onChange={(e) => setData('password', e.target.value)} />
+                        <InputError message={errors.password} />
                       </div>
                     </div>
-                  )}
-                  <div className="grid grid-cols-2">
-                    <div className="space-y-1">
-                      <Label>New Password</Label>
-                      <InputPassword value={data.password} onChange={(e) => setData('password', e.target.value)} />
-                      <InputError message={errors.password} />
+                    <div className="grid grid-cols-2">
+                      <div className="space-y-1">
+                        <Label>Confirm Password</Label>
+                        <InputPassword value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} />
+                        <InputError message={errors.password_confirmation} />
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <Button disabled={processing}>
+                        Save Changes
+                      </Button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2">
-                    <div className="space-y-1">
-                      <Label>Confirm Password</Label>
-                      <InputPassword value={data.password_confirmation} onChange={(e) => setData('password_confirmation', e.target.value)} />
-                      <InputError message={errors.password_confirmation} />
-                    </div>
-                  </div>
-                </div>
+                </form>
               </CardContent>
             </Card>
           </div>
