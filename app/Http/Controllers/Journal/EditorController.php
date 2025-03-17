@@ -64,7 +64,6 @@ class EditorController extends Controller
         $assign = AssignEditor::findOrFail($request->id);
 
         $assign->update([
-            'edited_at' => $request->status === 'approved' ? Carbon::now()->setTimezone('Asia/Manila') : null,
             'status' => $request->status
         ]);
     }

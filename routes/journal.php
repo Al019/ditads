@@ -60,6 +60,7 @@ Route::middleware(['auth', 'client', 'verified'])->group(function () {
 
   Route::get('/client/my-requests/pending', [ClientController::class, 'getPendingRequest'])->name('client.my.request.pending');
   Route::post('/client/my-requests/submit/request', [ClientController::class, 'submitRequest'])->name('client.my.request.submit.request');
+  Route::post('/client/my-requests/resubmit/request', [ClientController::class, 'resubmitRequest'])->name('client.my.request.resubmit.request');
   Route::get('/client/my-requests/approved', [ClientController::class, 'getApprovedRequest'])->name('client.my.request.approved');
   Route::get('/client/my-requests/rejected', [ClientController::class, 'getRejectedRequest'])->name('client.my.request.rejected');
 

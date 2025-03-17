@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('editor_id')->constrained('users');
             $table->string('edited_file')->nullable();
             $table->string('published_file')->nullable();
-            $table->timestamp('edited_at')->nullable();
             $table->timestamp('published_at')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();

@@ -15,7 +15,6 @@ class AssignEditor extends Model
         'editor_id',
         'edited_file',
         'published_file',
-        'edited_at',
         'published_at',
         'status',
     ];

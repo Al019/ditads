@@ -50,7 +50,7 @@ const Pending = () => {
   const { assigns, editors } = usePage().props
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false)
-  const { setData, post, reset } = useForm({
+  const { processing, setData, post, reset } = useForm({
     editor_id: null,
     id: null
   })
@@ -65,7 +65,7 @@ const Pending = () => {
   }
 
   const handleChangeEditor = () => {
-    post(route('editor.assigned.editor.update.editor'), {
+    post(route('admin.assigned.editor.update.editor'), {
       onSuccess: () => {
         handleOpen()
       }
@@ -203,13 +203,12 @@ const Pending = () => {
             </SelectContent>
           </Select>
           <DialogFooter>
-            <Button onClick={handleChangeEditor}>
+            <Button onClick={handleChangeEditor} disabled={processing}>
               Save
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </AuthenticatedLayout>
   )
 }

@@ -27,10 +27,50 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Download, FileCog, MoreHorizontal, Pencil, Settings2, UserPen } from "lucide-react"
 import { Button } from "@/Components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const Rejected = () => {
-  const { assigns } = usePage().props
+  const { assigns, editors } = usePage().props
   const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false)
+  const { processing, setData, post, reset } = useForm({
+    editor_id: null,
+    id: null
+  })
+
+  const handleOpen = (id) => {
+    if (id) {
+      setData('id', id)
+    } else {
+      reset()
+    }
+    setOpen(!open)
+  }
+
+  const handleChangeEditor = () => {
+    post(route('admin.assigned.editor.update.editor'), {
+      onSuccess: () => {
+        handleOpen()
+      }
+    })
+  }
 
   const searchTimeoutRef = useRef(null);
 
@@ -107,6 +147,10 @@ const Rejected = () => {
                         <DropdownMenuItem onClick={() => window.open(route('journal.download', { file: `edited_files/${assign.edited_file}` }), '_blank')} className="cursor-pointer">
                           <Download />Download Document
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleOpen(assign.id)} className="cursor-pointer">
+                          <UserPen />Change Editor
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -138,6 +182,33 @@ const Rejected = () => {
           </div>
         )}
       </div>
+
+      <Dialog open={open} onOpenChange={() => handleOpen()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Editor</DialogTitle>
+          </DialogHeader>
+          <Select onValueChange={(val) => setData('editor_id', val)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {editors.map((editor, index) => (
+                  <SelectItem key={index} value={editor.id}>
+                    {editor.first_name} {editor.last_name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <DialogFooter>
+            <Button onClick={handleChangeEditor} disabled={processing}>
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AuthenticatedLayout>
   )
 }

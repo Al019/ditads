@@ -45,8 +45,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Download, MoreHorizontal, ReceiptText } from "lucide-react"
+import { Download, MessageSquareMore, MoreHorizontal, ReceiptText } from "lucide-react"
 import { Label } from "@/Components/ui/label"
+import { Textarea } from "@/Components/ui/textarea"
 
 const Rejected = () => {
   const { requests } = usePage().props
@@ -56,13 +57,24 @@ const Rejected = () => {
     style: "currency",
     currency: "PHP",
   }).format(parseFloat(amount))
-  const [open, setOpen] = useState(false)
+  const [openShow, setOpenShow] = useState(false)
   const [data, setData] = useState({
     reference_number: null,
     receipt: null
   })
+  const [open, setOpen] = useState(false)
+  const [message, setMessage] = useState("")
 
-  const handleOpen = (payment) => {
+  const handleOpen = (message) => {
+    if (message) {
+      setMessage(message)
+    } else {
+      setMessage("")
+    }
+    setOpen(!open)
+  }
+
+  const handleOpenShow = (payment) => {
     if (payment) {
       setData({
         reference_number: payment.reference_number,
@@ -74,7 +86,7 @@ const Rejected = () => {
         receipt: null
       })
     }
-    setOpen(!open)
+    setOpenShow(!openShow)
   }
 
   const searchTimeoutRef = useRef(null);
@@ -153,8 +165,12 @@ const Rejected = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpen(request.payment)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpenShow(request.payment)} className="cursor-pointer">
                           <ReceiptText />Show Receipt
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleOpen(request.payment.message)} className="cursor-pointer">
+                          <MessageSquareMore />Show Message
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -188,7 +204,7 @@ const Rejected = () => {
         )}
       </div>
 
-      <Dialog open={open} onOpenChange={() => handleOpen()}>
+      <Dialog open={openShow} onOpenChange={() => handleOpenShow()}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Receipt</DialogTitle>
@@ -202,6 +218,15 @@ const Rejected = () => {
               <img src={`/storage/journal/receipts/${data?.receipt}`} className="object-contain h-full w-full" />
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={open} onOpenChange={() => handleOpen()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Message</DialogTitle>
+          </DialogHeader>
+          <Textarea value={message} />
         </DialogContent>
       </Dialog>
     </AuthenticatedLayout>

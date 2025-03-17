@@ -45,7 +45,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Check, Download, MoreHorizontal, ReceiptText, X } from "lucide-react"
+import { Check, Download, MessageSquareMore, MoreHorizontal, ReceiptText, X } from "lucide-react"
 import { Label } from "@/Components/ui/label"
 import {
   AlertDialog,
@@ -70,6 +70,17 @@ const Rejected = () => {
   }).format(parseFloat(amount))
   const [openShow, setOpenShow] = useState(false)
   const [show, setShow] = useState(null)
+  const [open, setOpen] = useState(false)
+  const [message, setMessage] = useState("")
+
+  const handleOpen = (message) => {
+    if (message) {
+      setMessage(message)
+    } else {
+      setMessage("")
+    }
+    setOpen(!open)
+  }
 
   const handleOpenShow = (request) => {
     if (request) {
@@ -167,6 +178,9 @@ const Rejected = () => {
                           <ReceiptText />Show Receipt
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleOpen(request.payment.message)} className="cursor-pointer">
+                          <MessageSquareMore />Show Message
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -213,6 +227,15 @@ const Rejected = () => {
               <img src={`/storage/journal/receipts/${show?.receipt}`} className="object-contain h-full w-full" />
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={open} onOpenChange={() => handleOpen()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Message</DialogTitle>
+          </DialogHeader>
+          <Textarea value={message} />
         </DialogContent>
       </Dialog>
     </AuthenticatedLayout>

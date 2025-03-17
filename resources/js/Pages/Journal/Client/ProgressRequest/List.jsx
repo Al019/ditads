@@ -105,28 +105,32 @@ const List = () => {
                     <div className="space-y-4">
                       <h1 className="text-center">{request.uploaded_file.split('/').pop()}</h1>
                       <div className="grid grid-cols-5 place-items-center gap-y-4">
-                        <Button size="icon">
+                        <Button variant={request.assign_editor ? 'default' : 'outline'} size="icon">
                           <UserPen />
                         </Button>
                         <Separator />
-                        <Button size="icon">
+                        <Button variant={request.assign_editor?.published_at ? 'default' : 'outline'} size="icon" disabled={request.assign_editor ? false : true}>
                           <FilePen />
                         </Button>
                         <Separator />
-                        <Button size="icon">
+                        <Button variant={request.payment ? 'default' : 'outline'} size="icon" disabled={request.assign_editor?.published_at ? false : true}>
                           <FileCheck2 />
                         </Button>
                         <p className="text-center">
-                          
+                          {request.assign_editor ? `Editor: ${request.assign_editor.user.first_name} ${request.assign_editor.user.last_name}` : 'Waiting for Editor'}
                         </p>
                         <div></div>
-                        <p className="text-center">
-
-                        </p>
+                        {request.assign_editor && (
+                          <p className="text-center">
+                            {request.assign_editor.published_at ? 'Published' : 'Publishing'}
+                          </p>
+                        )}
                         <div></div>
-                        <p className="text-center">
-
-                        </p>
+                        {request.assign_editor?.published_at && (
+                          <p className="text-center">
+                            {request.payment ? 'Paid' : 'Paying'}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </TableCell>

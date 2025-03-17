@@ -381,7 +381,8 @@ class AdminController extends Controller
     {
         AssignEditor::findOrFail($request->id)
             ->update([
-                'editor_id' => $request->editor_id
+                'editor_id' => $request->editor_id,
+                'status' => 'pending'
             ]);
     }
 
@@ -464,8 +465,13 @@ class AdminController extends Controller
             })
             ->paginate(10);
 
+        $editors = User::select('id', 'last_name', 'first_name')
+            ->where('role', 'editor')
+            ->get();
+
         return Inertia::render("Journal/Admin/AssignEditor/Rejected", [
-            "assigns" => $assigns
+            "assigns" => $assigns,
+            "editors" => $editors,
         ]);
     }
 
@@ -741,7 +747,7 @@ class AdminController extends Controller
                     $query->select('id', 'name');
                 },
                 'payment' => function ($query) {
-                    $query->select('request_id', 'payment_method_id', 'reference_number', 'receipt', 'status', 'created_at');
+                    $query->select('request_id', 'payment_method_id', 'reference_number', 'receipt', 'message', 'status', 'created_at');
                     $query->with([
                         'payment_method' => function ($query) {
                             $query->select('id', 'name');

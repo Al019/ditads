@@ -31,7 +31,7 @@ export default function AuthenticatedLayout({ children, title, button, tab }) {
             <SidebarProvider>
                 <AppSidebar />
                 <SidebarInset>
-                    <div className="sticky top-0 bg-background px-4">
+                    <div className="z-10 sticky top-0 bg-background px-4">
                         <header className="h-16 shrink-0 grid grid-cols-2 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
                             <div className="flex items-center justify-start gap-2">
                                 <div>

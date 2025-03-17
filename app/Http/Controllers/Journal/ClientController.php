@@ -9,6 +9,7 @@ use App\Models\Journal\Service;
 use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Storage;
 use Str;
 use function Laravel\Prompts\select;
 
@@ -93,6 +94,31 @@ class ClientController extends Controller
         ]);
     }
 
+    public function resubmitRequest(Request $request)
+    {
+        $req = \App\Models\Journal\Request::findOrFail($request->id);
+
+        $request->validate([
+            'uploaded_file' => ['required', 'mimes:docx', 'max:2048'],
+        ]);
+
+        if ($req->uploaded_file && Storage::disk('public')->exists('journal/uploaded_files/' . $req->uploaded_file)) {
+            Storage::disk('public')->delete('journal/uploaded_files/' . $req->uploaded_file);
+        }
+
+        $file = $request->file('uploaded_file');
+
+        $filename = Str::uuid() . '/' . $file->getClientOriginalName();
+
+        $file->storeAs('journal/uploaded_files', $filename, 'public');
+
+        $req->update([
+            'uploaded_file' => $filename,
+            'message' => null,
+            'status' => 'pending'
+        ]);
+    }
+
     public function getApprovedRequest(Request $request)
     {
         $user_id = $request->user()->id;
@@ -131,7 +157,7 @@ class ClientController extends Controller
 
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('service_id', 'request_number', 'uploaded_file', 'amount', 'message', 'status', 'created_at')
+        $requests = \App\Models\Journal\Request::select('id', 'service_id', 'request_number', 'uploaded_file', 'amount', 'message', 'status', 'created_at')
             ->where('client_id', $user_id)
             ->where('status', 'rejected')
             ->with([
@@ -175,6 +201,10 @@ class ClientController extends Controller
                             $query->select('id', 'last_name', 'first_name');
                         }
                     ]);
+                },
+                'payment' => function ($query) {
+                    $query->select('request_id', 'status');
+                    $query->where('status', 'approved');
                 }
             ])
             ->when($search, function ($query) use ($search) {
@@ -415,7 +445,7 @@ class ClientController extends Controller
                     $query->select('id', 'name');
                 },
                 'payment' => function ($query) {
-                    $query->select('request_id', 'payment_method_id', 'reference_number', 'receipt', 'status', 'created_at');
+                    $query->select('request_id', 'payment_method_id', 'reference_number', 'receipt', 'message', 'status', 'created_at');
                     $query->with([
                         'payment_method' => function ($query) {
                             $query->select('id', 'name');

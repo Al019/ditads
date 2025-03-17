@@ -45,8 +45,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Download, MessageSquareMore, MoreHorizontal } from "lucide-react"
+import { Download, MessageSquareMore, MoreHorizontal, Send, Upload } from "lucide-react"
 import { Textarea } from "@/Components/ui/textarea"
+import Word from '../../../../../../public/images/word.png'
 
 const Rejected = () => {
   const { requests } = usePage().props
@@ -58,6 +59,21 @@ const Rejected = () => {
   }).format(parseFloat(amount))
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState("")
+  const { data, processing, errors, post, reset, setData, setError } = useForm({
+    id: null,
+    uploaded_file: null
+  })
+  const [openSubmit, setOpenSubmit] = useState(false)
+
+  const handleOpenSubmit = (id) => {
+    if (id) {
+      setData('id', id)
+    } else {
+      reset()
+    }
+    setOpenSubmit(!openSubmit)
+    setError({ uploaded_file: null })
+  }
 
   const handleOpen = (message) => {
     if (message) {
@@ -93,6 +109,14 @@ const Rejected = () => {
 
   const handlePage = (url) => {
     router.get(url, {}, { preserveState: true })
+  }
+
+  const handleResubmit = () => {
+    post(route('client.my.request.resubmit.request'), {
+      onSuccess: () => {
+        handleOpenSubmit()
+      }
+    })
   }
 
   return (
@@ -151,6 +175,9 @@ const Rejected = () => {
                         <DropdownMenuItem onClick={() => handleOpen(request.message)} className="cursor-pointer">
                           <MessageSquareMore />Show Message
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenSubmit(request.id)} className="cursor-pointer">
+                          <Send />Resubmit
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
@@ -189,6 +216,45 @@ const Rejected = () => {
             <DialogTitle>Message</DialogTitle>
           </DialogHeader>
           <Textarea value={message} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openSubmit} onOpenChange={() => handleOpenSubmit()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Resubmit File</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-1">
+            <div className=" flex items-center space-x-4 rounded-md border p-4">
+              <img src={Word} className="size-8" />
+              <div className="flex-1 space-y-1">
+                {data.uploaded_file ? (
+                  <>
+                    <p className="text-sm font-medium leading-none">
+                      {data.uploaded_file.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Word document
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm font-medium leading-none">
+                    No file chosen
+                  </p>
+                )}
+              </div>
+              <Button onClick={() => document.getElementById("uploaded_file").click()} size="icon" variant="ghost">
+                <Upload />
+              </Button>
+            </div>
+            <input accept=".docx" id="uploaded_file" type="file" onChange={(e) => setData("uploaded_file", e.target.files[0])} hidden />
+            <InputError message={errors.uploaded_file} />
+          </div>
+          <DialogFooter>
+            <Button onClick={handleResubmit} disabled={processing}>
+              Submit
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </AuthenticatedLayout>
