@@ -45,9 +45,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Download, MessageSquareMore, MoreHorizontal, ReceiptText } from "lucide-react"
+import { Download, HandCoins, MessageSquareMore, MoreHorizontal, ReceiptText, Upload } from "lucide-react"
 import { Label } from "@/Components/ui/label"
 import { Textarea } from "@/Components/ui/textarea"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 const Rejected = () => {
   const { requests } = usePage().props
@@ -58,12 +65,18 @@ const Rejected = () => {
     currency: "PHP",
   }).format(parseFloat(amount))
   const [openShow, setOpenShow] = useState(false)
-  const [data, setData] = useState({
-    reference_number: null,
-    receipt: null
-  })
+  const [show, setShow] = useState([])
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState("")
+  const { data, errors, processing, setData, post, reset, setError } = useForm({
+    payment_id: null,
+    reference_number: "",
+    receipt: null
+  })
+  const [payment, setPayment] = useState(null)
+  const [openRepay, setOpenRepay] = useState(false)
+  const [tab, setTab] = useState("1")
+  const [previewReceipt, setPreviewReceipt] = useState(null)
 
   const handleOpen = (message) => {
     if (message) {
@@ -76,17 +89,24 @@ const Rejected = () => {
 
   const handleOpenShow = (payment) => {
     if (payment) {
-      setData({
-        reference_number: payment.reference_number,
-        receipt: payment.receipt
-      })
+      setShow(payment)
     } else {
-      setData({
-        reference_number: null,
-        receipt: null
-      })
+      setShow([])
     }
     setOpenShow(!openShow)
+  }
+
+  const handleOpenRepay = (payment_id, payment_method) => {
+    if (payment_id || payment_method) {
+      setData('payment_id', payment_id)
+      setPayment(payment_method)
+    } else {
+      reset()
+      setPayment(null)
+    }
+    setError({ reference_number: null, receipt: null })
+    setOpenRepay(!openRepay)
+    setTab("1")
   }
 
   const searchTimeoutRef = useRef(null);
@@ -114,6 +134,14 @@ const Rejected = () => {
 
   const handlePage = (url) => {
     router.get(url, {}, { preserveState: true })
+  }
+
+  const handlePay = () => {
+    post(route('client.published.document.repay'), {
+      onSuccess: () => {
+        handleOpenRepay()
+      }
+    })
   }
 
   return (
@@ -165,12 +193,15 @@ const Rejected = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpenShow(request.payment)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpenShow(request.payment.receipt)} className="cursor-pointer">
                           <ReceiptText />Show Receipt
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => handleOpen(request.payment.message)} className="cursor-pointer">
                           <MessageSquareMore />Show Message
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleOpenRepay(request.payment.id, request.payment.payment_method)} className="cursor-pointer">
+                          <HandCoins />Repay
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -209,15 +240,23 @@ const Rejected = () => {
           <DialogHeader>
             <DialogTitle>Receipt</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <Label>Reference Number</Label>
-              <Input value={data?.reference_number} />
-            </div>
-            <div className="max-w-[250px] mx-auto h-[300px]">
-              <img src={`/storage/journal/receipts/${data?.receipt}`} className="object-contain h-full w-full" />
-            </div>
-          </div>
+          <Carousel>
+            <CarouselContent>
+              {show?.map((d, i) => (
+                <CarouselItem key={i}>
+                  <div className="space-y-4 px-2">
+                    <div className="space-y-1">
+                      <Label>Reference Number</Label>
+                      <Input value={d.reference_number} readOnly />
+                    </div>
+                    <div className="max-w-[250px] mx-auto h-[300px]">
+                      <img src={`/storage/journal/receipts/${d.receipt_image}`} className="object-contain h-full w-full" />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </DialogContent>
       </Dialog>
 
@@ -226,7 +265,96 @@ const Rejected = () => {
           <DialogHeader>
             <DialogTitle>Message</DialogTitle>
           </DialogHeader>
-          <Textarea value={message} />
+          <Textarea value={message} readOnly />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openRepay} onOpenChange={() => handleOpenRepay()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Pay with {payment?.name}</DialogTitle>
+          </DialogHeader>
+          {tab === '1' && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label>Account Name</Label>
+                  <Input value={payment?.account_name} readOnly />
+                </div>
+                <div className="space-y-1">
+                  <Label>Account Number</Label>
+                  <Input value={payment?.account_number} readOnly />
+                </div>
+              </div>
+              {payment?.qr_code && (
+                <div className="max-w-[250px] mx-auto h-[300px]">
+                  <img src={`/storage/journal/qr_codes/${payment?.qr_code}`} className="object-contain h-full w-full" />
+                </div>
+              )}
+            </>
+          )}
+          {tab === '2' && (
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <Label>Reference Number</Label>
+                <Input value={data.reference_number} onChange={(e) => setData('reference_number', e.target.value)} />
+                <InputError message={errors.reference_number} />
+              </div>
+              <div className="space-y-1">
+                <Label>Upload Receipt</Label>
+                <div className=" flex items-center space-x-4 rounded-md border p-4">
+                  <ReceiptText />
+                  <div className="flex-1">
+                    {data.receipt ? (
+                      <p className="text-sm font-medium leading-none">
+                        {data.receipt.name}
+                      </p>
+                    ) : (
+                      <p className="text-sm font-medium leading-none">
+                        No file chosen
+                      </p>
+                    )}
+                  </div>
+                  <Button onClick={() => document.getElementById("receipt").click()} size="icon" variant="ghost">
+                    <Upload />
+                  </Button>
+                </div>
+                <input accept=".jpg,.jpeg,.png" id="receipt" type="file" onChange={(e) => {
+                  const file = e.target.files[0];
+                  setData('receipt', file)
+                  if (file) {
+                    const imageUrl = URL.createObjectURL(file);
+                    setPreviewReceipt(imageUrl);
+                  } else {
+                    setPreviewReceipt(null)
+                  }
+                }} hidden />
+                <InputError message={errors.receipt} />
+              </div>
+              {previewReceipt && (
+                <div className="max-w-[250px] mx-auto h-[300px]">
+                  <img src={previewReceipt} className="object-contain h-full w-full" />
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            {tab === '1' && (
+              <Button onClick={() => setTab('2')}>
+                Next
+              </Button>
+            )}
+            {tab === '2' && (
+              <>
+                <Button variant="ghost" onClick={() => setTab('1')}>
+                  Back
+                </Button>
+                <Button onClick={handlePay} disabled={processing}>
+                  Pay
+                </Button>
+              </>
+            )}
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </AuthenticatedLayout>

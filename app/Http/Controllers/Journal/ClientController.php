@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Journal;
 use App\Http\Controllers\Controller;
 use App\Models\Journal\Payment;
 use App\Models\Journal\PaymentMethod;
+use App\Models\Journal\Receipt;
 use App\Models\Journal\Service;
 use DB;
 use Illuminate\Http\Request;
@@ -279,11 +280,42 @@ class ClientController extends Controller
 
         $file->storeAs('journal/receipts', $filename, 'public');
 
-        Payment::create([
+        $payment = Payment::create([
             'request_id' => $request->id,
             'payment_method_id' => $request->payment_method_id,
+        ]);
+
+        Receipt::create([
+            'payment_id' => $payment->id,
             'reference_number' => $request->reference_number,
-            'receipt' => $filename,
+            'receipt_image' => $filename,
+        ]);
+    }
+
+    public function repayPublishDocument(Request $request)
+    {
+        $payment = Payment::findOrFail($request->payment_id);
+
+        $request->validate([
+            'reference_number' => ['required'],
+            'receipt' => ['required', 'mimes:jpeg,jpg,png', 'max:2048'],
+        ]);
+
+        $file = $request->file('receipt');
+
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+        $file->storeAs('journal/receipts', $filename, 'public');
+
+        $payment->update([
+            'message' => null,
+            'status' => 'pending'
+        ]);
+
+        Receipt::create([
+            'payment_id' => $payment->id,
+            'reference_number' => $request->reference_number,
+            'receipt_image' => $filename,
         ]);
     }
 
@@ -347,11 +379,14 @@ class ClientController extends Controller
                     $query->select('id', 'name');
                 },
                 'payment' => function ($query) {
-                    $query->select('request_id', 'payment_method_id', 'reference_number', 'receipt', 'status', 'created_at');
+                    $query->select('id', 'request_id', 'payment_method_id', 'status', 'created_at');
                     $query->with([
                         'payment_method' => function ($query) {
                             $query->select('id', 'name');
-                        }
+                        },
+                        'receipt' => function ($query) {
+                            $query->select('payment_id', 'reference_number', 'receipt_image');
+                        },
                     ]);
                 }
             ])
@@ -361,9 +396,6 @@ class ClientController extends Controller
                         ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
-                        })
-                        ->orWhereHas('payment', function ($q) use ($search) {
-                            $q->where('reference_number', 'like', '%' . $search . '%');
                         })
                         ->orWhereHas('payment.payment_method', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
@@ -396,11 +428,14 @@ class ClientController extends Controller
                     $query->select('id', 'name');
                 },
                 'payment' => function ($query) {
-                    $query->select('request_id', 'payment_method_id', 'reference_number', 'receipt', 'status', 'created_at');
+                    $query->select('id', 'request_id', 'payment_method_id', 'status', 'created_at');
                     $query->with([
                         'payment_method' => function ($query) {
                             $query->select('id', 'name', 'type');
-                        }
+                        },
+                        'receipt' => function ($query) {
+                            $query->select('payment_id', 'reference_number', 'receipt_image');
+                        },
                     ]);
                 }
             ])
@@ -410,9 +445,6 @@ class ClientController extends Controller
                         ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
-                        })
-                        ->orWhereHas('payment', function ($q) use ($search) {
-                            $q->where('reference_number', 'like', '%' . $search . '%');
                         })
                         ->orWhereHas('payment.payment_method', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
@@ -445,11 +477,14 @@ class ClientController extends Controller
                     $query->select('id', 'name');
                 },
                 'payment' => function ($query) {
-                    $query->select('request_id', 'payment_method_id', 'reference_number', 'receipt', 'message', 'status', 'created_at');
+                    $query->select('id', 'request_id', 'payment_method_id', 'message', 'status', 'created_at');
                     $query->with([
                         'payment_method' => function ($query) {
-                            $query->select('id', 'name');
-                        }
+                            $query->select('id', 'name', 'account_name', 'account_number', 'qr_code');
+                        },
+                        'receipt' => function ($query) {
+                            $query->select('payment_id', 'reference_number', 'receipt_image');
+                        },
                     ]);
                 }
             ])
@@ -459,9 +494,6 @@ class ClientController extends Controller
                         ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
-                        })
-                        ->orWhereHas('payment', function ($q) use ($search) {
-                            $q->where('reference_number', 'like', '%' . $search . '%');
                         })
                         ->orWhereHas('payment.payment_method', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');

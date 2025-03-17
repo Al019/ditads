@@ -68,6 +68,7 @@ Route::middleware(['auth', 'client', 'verified'])->group(function () {
 
   Route::get('/client/published/documents/unpaid', [ClientController::class, 'publishDocumentUnpaid'])->name('client.published.document.unpaid');
   Route::post('/client/published/documents/pay', [ClientController::class, 'payPublishDocument'])->name('client.published.document.pay');
+  Route::post('/client/published/documents/repay', [ClientController::class, 'repayPublishDocument'])->name('client.published.document.repay');
   Route::get('/client/published/documents/paid', [ClientController::class, 'publishDocumentPaid'])->name('client.published.document.paid');
 
   Route::get('/client/payments/transactions/pending', [ClientController::class, 'paymentPending'])->name('client.payment.transaction.pending');

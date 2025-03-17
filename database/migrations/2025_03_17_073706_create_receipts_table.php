@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('payments', function (Blueprint $table) {
+        Schema::create('receipts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('request_id')->constrained('requests');
-            $table->foreignId('payment_method_id')->constrained('payment_methods');
-            $table->longText('message')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->foreignId('payment_id')->constrained('payments');
+            $table->string('reference_number');
+            $table->string('receipt_image')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('receipts');
     }
 };

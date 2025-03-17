@@ -47,6 +47,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Download, MoreHorizontal, ReceiptText } from "lucide-react"
 import { Label } from "@/Components/ui/label"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 const Approved = () => {
   const { requests } = usePage().props
@@ -57,17 +64,16 @@ const Approved = () => {
     currency: "PHP",
   }).format(parseFloat(amount))
   const [open, setOpen] = useState(false)
-  const [data, setData] = useState(null)
+  const [data, setData] = useState([])
+  const [type, setType] = useState(null)
 
   const handleOpen = (payment, type) => {
     if (payment) {
-      setData({
-        type: type,
-        reference_number: payment.reference_number,
-        receipt: payment.receipt
-      })
+      setData(payment)
+      setType(type)
     } else {
-      setData(null)
+      setData([])
+      setType(null)
     }
     setOpen(!open)
   }
@@ -148,7 +154,7 @@ const Approved = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpen(request.payment, request.payment.payment_method.type)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpen(request.payment.receipt, request.payment.payment_method.type)} className="cursor-pointer">
                           <ReceiptText />Show Receipt
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -188,17 +194,23 @@ const Approved = () => {
           <DialogHeader>
             <DialogTitle>Receipt</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <Label>{data?.type === 'cash' && 'OR Number' || data?.type === 'e-wallet' && 'Reference Number'}</Label>
-              <Input value={data?.reference_number} />
-            </div>
-            {data?.type === 'e-wallet' && (
-              <div className="max-w-[250px] mx-auto h-[300px]">
-                <img src={`/storage/journal/receipts/${data?.receipt}`} className="object-contain h-full w-full" />
-              </div>
-            )}
-          </div>
+          <Carousel>
+            <CarouselContent>
+              {data?.map((d, i) => (
+                <CarouselItem key={i}>
+                  <div className="space-y-4 px-2">
+                    <div className="space-y-1">
+                      <Label>{type === 'cash' && 'OR Number' || type === 'e-wallet' && 'Reference Number'}</Label>
+                      <Input value={d.reference_number} readOnly />
+                    </div>
+                    <div className="max-w-[250px] mx-auto h-[300px]">
+                      <img src={`/storage/journal/receipts/${d.receipt_image}`} className="object-contain h-full w-full" />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </DialogContent>
       </Dialog>
     </AuthenticatedLayout>

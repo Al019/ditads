@@ -59,6 +59,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Textarea } from "@/Components/ui/textarea"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 const Approved = () => {
   const { requests } = usePage().props
@@ -69,17 +76,16 @@ const Approved = () => {
     currency: "PHP",
   }).format(parseFloat(amount))
   const [openShow, setOpenShow] = useState(false)
-  const [show, setShow] = useState(null)
+  const [show, setShow] = useState([])
+  const [type, setType] = useState(null)
 
-  const handleOpenShow = (request, type) => {
-    if (request) {
-      setShow({
-        type: type,
-        reference_number: request.payment.reference_number,
-        receipt: request.payment.receipt
-      })
+  const handleOpenShow = (payment, type) => {
+    if (payment) {
+      setShow(payment)
+      setType(type)
     } else {
-      setShow(null)
+      setShow([])
+      setType(null)
     }
     setOpenShow(!openShow)
   }
@@ -164,7 +170,7 @@ const Approved = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpenShow(request, request.payment.payment_method.type)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpenShow(request.payment.receipt, request.payment.payment_method.type)} className="cursor-pointer">
                           <ReceiptText />Show Receipt
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -204,17 +210,23 @@ const Approved = () => {
           <DialogHeader>
             <DialogTitle>Receipt</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <Label>{show?.type === 'cash' && 'OR Number' || show?.type === 'e-wallet' && 'Reference Number'}</Label>
-              <Input value={show?.reference_number} />
-            </div>
-            {show?.type === 'e-wallet' && (
-              <div className="max-w-[250px] mx-auto h-[300px]">
-                <img src={`/storage/journal/receipts/${show?.receipt}`} className="object-contain h-full w-full" />
-              </div>
-            )}
-          </div>
+          <Carousel>
+            <CarouselContent>
+              {show?.map((d, i) => (
+                <CarouselItem key={i}>
+                  <div className="space-y-4 px-2">
+                    <div className="space-y-1">
+                      <Label>{type === 'cash' && 'OR Number' || type === 'e-wallet' && 'Reference Number'}</Label>
+                      <Input value={d.reference_number} readOnly />
+                    </div>
+                    <div className="max-w-[250px] mx-auto h-[300px]">
+                      <img src={`/storage/journal/receipts/${d.receipt_image}`} className="object-contain h-full w-full" />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </DialogContent>
       </Dialog>
     </AuthenticatedLayout>

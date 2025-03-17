@@ -59,6 +59,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Textarea } from "@/Components/ui/textarea"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 const Rejected = () => {
   const { requests } = usePage().props
@@ -69,7 +76,7 @@ const Rejected = () => {
     currency: "PHP",
   }).format(parseFloat(amount))
   const [openShow, setOpenShow] = useState(false)
-  const [show, setShow] = useState(null)
+  const [show, setShow] = useState([])
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState("")
 
@@ -82,14 +89,11 @@ const Rejected = () => {
     setOpen(!open)
   }
 
-  const handleOpenShow = (request) => {
-    if (request) {
-      setShow({
-        reference_number: request.payment.reference_number,
-        receipt: request.payment.receipt
-      })
+  const handleOpenShow = (payment) => {
+    if (payment) {
+      setShow(payment)
     } else {
-      setShow(null)
+      setShow([])
     }
     setOpenShow(!openShow)
   }
@@ -174,7 +178,7 @@ const Rejected = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpenShow(request)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpenShow(request.payment.receipt)} className="cursor-pointer">
                           <ReceiptText />Show Receipt
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -218,15 +222,23 @@ const Rejected = () => {
           <DialogHeader>
             <DialogTitle>Receipt</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <Label>Reference Number</Label>
-              <Input value={show?.reference_number} />
-            </div>
-            <div className="max-w-[250px] mx-auto h-[300px]">
-              <img src={`/storage/journal/receipts/${show?.receipt}`} className="object-contain h-full w-full" />
-            </div>
-          </div>
+          <Carousel>
+            <CarouselContent>
+              {show?.map((d, i) => (
+                <CarouselItem key={i}>
+                  <div className="space-y-4 px-2">
+                    <div className="space-y-1">
+                      <Label>Reference Number</Label>
+                      <Input value={d.reference_number} readOnly />
+                    </div>
+                    <div className="max-w-[250px] mx-auto h-[300px]">
+                      <img src={`/storage/journal/receipts/${d.receipt_image}`} className="object-contain h-full w-full" />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </DialogContent>
       </Dialog>
 
@@ -235,7 +247,7 @@ const Rejected = () => {
           <DialogHeader>
             <DialogTitle>Message</DialogTitle>
           </DialogHeader>
-          <Textarea value={message} />
+          <Textarea value={message} readOnly />
         </DialogContent>
       </Dialog>
     </AuthenticatedLayout>

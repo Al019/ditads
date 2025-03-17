@@ -47,6 +47,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Download, MoreHorizontal, ReceiptText } from "lucide-react"
 import { Label } from "@/Components/ui/label"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 const Pending = () => {
   const { requests } = usePage().props
@@ -57,25 +64,16 @@ const Pending = () => {
     currency: "PHP",
   }).format(parseFloat(amount))
   const [open, setOpen] = useState(false)
-  const [data, setData] = useState({
-    reference_number: null,
-    receipt: null
-  })
+  const [data, setData] = useState([])
 
   const handleOpen = (payment) => {
     if (payment) {
-      setData({
-        reference_number: payment.reference_number,
-        receipt: payment.receipt
-      })
+      setData(payment);
     } else {
-      setData({
-        reference_number: null,
-        receipt: null
-      })
+      setData([])
     }
-    setOpen(!open)
-  }
+    setOpen(!open);
+  };
 
   const searchTimeoutRef = useRef(null);
 
@@ -153,7 +151,7 @@ const Pending = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpen(request.payment)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpen(request.payment.receipt)} className="cursor-pointer">
                           <ReceiptText />Show Receipt
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -193,15 +191,23 @@ const Pending = () => {
           <DialogHeader>
             <DialogTitle>Receipt</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <Label>Reference Number</Label>
-              <Input value={data?.reference_number} />
-            </div>
-            <div className="max-w-[250px] mx-auto h-[300px]">
-              <img src={`/storage/journal/receipts/${data?.receipt}`} className="object-contain h-full w-full" />
-            </div>
-          </div>
+          <Carousel>
+            <CarouselContent>
+              {data?.map((d, i) => (
+                <CarouselItem key={i}>
+                  <div className="space-y-4 px-2">
+                    <div className="space-y-1">
+                      <Label>Reference Number</Label>
+                      <Input value={d.reference_number} readOnly />
+                    </div>
+                    <div className="max-w-[250px] mx-auto h-[300px]">
+                      <img src={`/storage/journal/receipts/${d.receipt_image}`} className="object-contain h-full w-full" />
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
         </DialogContent>
       </Dialog>
     </AuthenticatedLayout>

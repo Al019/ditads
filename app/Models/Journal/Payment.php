@@ -4,6 +4,7 @@ namespace App\Models\Journal;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Payment extends Model
 {
@@ -12,8 +13,6 @@ class Payment extends Model
     protected $fillable = [
         'request_id',
         'payment_method_id',
-        'reference_number',
-        'receipt',
         'message',
         'status',
     ];
@@ -26,5 +25,10 @@ class Payment extends Model
     public function payment_method(): BelongsTo
     {
         return $this->belongsTo(PaymentMethod::class, 'payment_method_id');
+    }
+
+    public function receipt(): HasMany
+    {
+        return $this->hasMany(Receipt::class,'payment_id');
     }
 }
