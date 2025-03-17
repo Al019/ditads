@@ -57,22 +57,17 @@ const Approved = () => {
     currency: "PHP",
   }).format(parseFloat(amount))
   const [open, setOpen] = useState(false)
-  const [data, setData] = useState({
-    reference_number: null,
-    receipt: null
-  })
+  const [data, setData] = useState(null)
 
-  const handleOpen = (payment) => {
+  const handleOpen = (payment, type) => {
     if (payment) {
       setData({
+        type: type,
         reference_number: payment.reference_number,
         receipt: payment.receipt
       })
     } else {
-      setData({
-        reference_number: null,
-        receipt: null
-      })
+      setData(null)
     }
     setOpen(!open)
   }
@@ -153,7 +148,7 @@ const Approved = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpen(request.payment)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpen(request.payment, request.payment.payment_method.type)} className="cursor-pointer">
                           <ReceiptText />Show Receipt
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -195,12 +190,14 @@ const Approved = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1">
-              <Label>Reference Number</Label>
+              <Label>{data?.type === 'cash' && 'OR Number' || data?.type === 'e-wallet' && 'Reference Number'}</Label>
               <Input value={data?.reference_number} />
             </div>
-            <div className="max-w-[250px] mx-auto h-[300px]">
-              <img src={`/storage/journal/receipts/${data?.receipt}`} className="object-contain h-full w-full" />
-            </div>
+            {data?.type === 'e-wallet' && (
+              <div className="max-w-[250px] mx-auto h-[300px]">
+                <img src={`/storage/journal/receipts/${data?.receipt}`} className="object-contain h-full w-full" />
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

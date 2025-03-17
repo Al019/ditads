@@ -167,9 +167,6 @@ const Rejected = () => {
                           <ReceiptText />Show Receipt
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">
-                          <Download />Download Document
-                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

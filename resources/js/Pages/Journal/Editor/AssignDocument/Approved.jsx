@@ -69,6 +69,7 @@ const Approved = () => {
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
+              <TableHead>Request Number</TableHead>
               <TableHead>Client Name</TableHead>
               <TableHead>Service</TableHead>
               <TableHead>Edited Document</TableHead>
@@ -81,6 +82,9 @@ const Approved = () => {
                 <TableRow key={index}>
                   <TableCell className="font-medium">
                     {index + 1}
+                  </TableCell>
+                  <TableCell>
+                    {assign.request.request_number}
                   </TableCell>
                   <TableCell>
                     {assign.request.user.first_name} {assign.request.user.last_name}
@@ -110,7 +114,7 @@ const Approved = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>

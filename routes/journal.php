@@ -29,6 +29,7 @@ Route::middleware(['auth', 'admin', 'verified'])->group(function () {
   Route::get('/admin/assigned/editors/rejected', [AdminController::class, 'assignEditorRejected'])->name('admin.assigned.editor.rejected');
 
   Route::get('/admin/published/documents/unpaid', [AdminController::class, 'publishDocumentUnpaid'])->name('admin.published.document.unpaid');
+  Route::post('/admin/published/documents/pay', [AdminController::class, 'publishDocumentPay'])->name('admin.published.document.pay');
   Route::get('/admin/published/documents/paid', [AdminController::class, 'publishDocumentPaid'])->name('admin.published.document.paid');
 
   Route::get('/admin/payments/transactions/pending', [AdminController::class, 'paymentPending'])->name('admin.payment.transaction.pending');

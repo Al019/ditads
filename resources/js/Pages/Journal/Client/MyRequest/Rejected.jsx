@@ -105,6 +105,7 @@ const Rejected = () => {
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
+              <TableHead>Request Number</TableHead>
               <TableHead>Service</TableHead>
               <TableHead>Uploaded Document</TableHead>
               <TableHead>Date Requested</TableHead>
@@ -118,6 +119,9 @@ const Rejected = () => {
                 <TableRow key={index}>
                   <TableCell className="font-medium">
                     {index + 1}
+                  </TableCell>
+                  <TableCell>
+                    {request.request_number}
                   </TableCell>
                   <TableCell>
                     {request.service.name}
@@ -154,7 +158,7 @@ const Rejected = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>

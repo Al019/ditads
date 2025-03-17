@@ -25,7 +25,7 @@ class ClientController extends Controller
 
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('service_id', 'uploaded_file', 'amount', 'status', 'created_at')
+        $requests = \App\Models\Journal\Request::select('service_id', 'request_number', 'uploaded_file', 'amount', 'status', 'created_at')
             ->where('client_id', $user_id)
             ->where('status', 'pending')
             ->with([
@@ -36,6 +36,7 @@ class ClientController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(uploaded_file, '/', -1)"), 'like', '%' . $search . '%')
+                        ->orWhere('request_number', 'like', '%' . $search . '%')
                         ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
@@ -59,7 +60,7 @@ class ClientController extends Controller
     private function generateUniqueRequestNumber()
     {
         do {
-            $randomNumber = mt_rand(10000000, 99999999);
+            $randomNumber = mt_rand(100000000000, 999999999999);
         } while (\App\Models\Journal\Request::where('request_number', $randomNumber)->exists());
 
         return $randomNumber;
@@ -98,7 +99,7 @@ class ClientController extends Controller
 
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('service_id', 'uploaded_file', 'amount', 'status', 'created_at')
+        $requests = \App\Models\Journal\Request::select('service_id', 'request_number', 'uploaded_file', 'amount', 'status', 'created_at')
             ->where('client_id', $user_id)
             ->where('status', 'approved')
             ->with([
@@ -109,6 +110,7 @@ class ClientController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(uploaded_file, '/', -1)"), 'like', '%' . $search . '%')
+                        ->orWhere('request_number', 'like', '%' . $search . '%')
                         ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
@@ -129,7 +131,7 @@ class ClientController extends Controller
 
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('service_id', 'uploaded_file', 'amount', 'message', 'status', 'created_at')
+        $requests = \App\Models\Journal\Request::select('service_id', 'request_number', 'uploaded_file', 'amount', 'message', 'status', 'created_at')
             ->where('client_id', $user_id)
             ->where('status', 'rejected')
             ->with([
@@ -140,6 +142,7 @@ class ClientController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(uploaded_file, '/', -1)"), 'like', '%' . $search . '%')
+                        ->orWhere('request_number', 'like', '%' . $search . '%')
                         ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
@@ -193,7 +196,7 @@ class ClientController extends Controller
 
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('id', 'service_id', 'amount')
+        $requests = \App\Models\Journal\Request::select('id', 'service_id', 'request_number', 'amount')
             ->where('client_id', $user_id)
             ->whereHas('assign_editor', function ($query) {
                 $query->whereNotNull('published_at');
@@ -209,7 +212,8 @@ class ClientController extends Controller
             ])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('amount', 'like', '%' . $search . '%')
+                    $q->where('request_number', 'like', '%' . $search . '%')
+                        ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
                         })
@@ -259,7 +263,7 @@ class ClientController extends Controller
 
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('id', 'service_id', 'amount')
+        $requests = \App\Models\Journal\Request::select('id', 'service_id', 'request_number', 'amount')
             ->where('client_id', $user_id)
             ->whereHas('assign_editor', function ($query) {
                 $query->whereNotNull('published_at');
@@ -277,7 +281,8 @@ class ClientController extends Controller
             ])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('amount', 'like', '%' . $search . '%')
+                    $q->where('request_number', 'like', '%' . $search . '%')
+                        ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
                         })
@@ -364,7 +369,7 @@ class ClientController extends Controller
                     $query->select('request_id', 'payment_method_id', 'reference_number', 'receipt', 'status', 'created_at');
                     $query->with([
                         'payment_method' => function ($query) {
-                            $query->select('id', 'name');
+                            $query->select('id', 'name', 'type');
                         }
                     ]);
                 }

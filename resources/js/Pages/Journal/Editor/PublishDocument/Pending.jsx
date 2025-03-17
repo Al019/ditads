@@ -107,6 +107,7 @@ const Pending = () => {
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
+              <TableHead>Request Number</TableHead>
               <TableHead>Client Name</TableHead>
               <TableHead>Service</TableHead>
               <TableHead>Edited Document</TableHead>
@@ -119,6 +120,9 @@ const Pending = () => {
                 <TableRow key={index}>
                   <TableCell className="font-medium">
                     {index + 1}
+                  </TableCell>
+                  <TableCell>
+                    {assign.request.request_number}
                   </TableCell>
                   <TableCell>
                     {assign.request.user.first_name} {assign.request.user.last_name}
@@ -152,7 +156,7 @@ const Pending = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>
@@ -183,7 +187,7 @@ const Pending = () => {
             <DialogTitle>Are you sure you want to publish?</DialogTitle>
           </DialogHeader>
           <div className="space-y-1">
-            <Label>Upload File</Label>
+            <Label>Upload Published File</Label>
             <div className=" flex items-center space-x-4 rounded-md border p-4">
               <img src={PDF} className="size-8" />
               <div className="flex-1 space-y-1">

@@ -71,9 +71,10 @@ const Approved = () => {
   const [openShow, setOpenShow] = useState(false)
   const [show, setShow] = useState(null)
 
-  const handleOpenShow = (request) => {
+  const handleOpenShow = (request, type) => {
     if (request) {
       setShow({
+        type: type,
         reference_number: request.payment.reference_number,
         receipt: request.payment.receipt
       })
@@ -163,12 +164,8 @@ const Approved = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleOpenShow(request)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpenShow(request, request.payment.payment_method.type)} className="cursor-pointer">
                           <ReceiptText />Show Receipt
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem className="cursor-pointer">
-                          <Download />Download Document
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -209,12 +206,14 @@ const Approved = () => {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-1">
-              <Label>Reference Number</Label>
+              <Label>{show?.type === 'cash' && 'OR Number' || show?.type === 'e-wallet' && 'Reference Number'}</Label>
               <Input value={show?.reference_number} />
             </div>
-            <div className="max-w-[250px] mx-auto h-[300px]">
-              <img src={`/storage/journal/receipts/${show?.receipt}`} className="object-contain h-full w-full" />
-            </div>
+            {show?.type === 'e-wallet' && (
+              <div className="max-w-[250px] mx-auto h-[300px]">
+                <img src={`/storage/journal/receipts/${show?.receipt}`} className="object-contain h-full w-full" />
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

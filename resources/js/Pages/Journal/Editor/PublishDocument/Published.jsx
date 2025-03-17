@@ -70,6 +70,7 @@ const Published = () => {
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
+              <TableHead>Request Number</TableHead>
               <TableHead>Client Name</TableHead>
               <TableHead>Service</TableHead>
               <TableHead>Published Document</TableHead>
@@ -83,6 +84,9 @@ const Published = () => {
                 <TableRow key={index}>
                   <TableCell className="font-medium">
                     {index + 1}
+                  </TableCell>
+                  <TableCell>
+                    {assign.request.request_number}
                   </TableCell>
                   <TableCell>
                     {assign.request.user.first_name} {assign.request.user.last_name}
@@ -115,7 +119,7 @@ const Published = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>

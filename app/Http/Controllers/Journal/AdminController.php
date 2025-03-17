@@ -181,7 +181,7 @@ class AdminController extends Controller
     {
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('id', 'service_id', 'client_id', 'uploaded_file', 'amount', 'status', 'created_at')
+        $requests = \App\Models\Journal\Request::select('id', 'request_number', 'service_id', 'client_id', 'uploaded_file', 'amount', 'status', 'created_at')
             ->where('status', 'pending')
             ->with([
                 'service' => function ($query) {
@@ -194,6 +194,7 @@ class AdminController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(uploaded_file, '/', -1)"), 'like', '%' . $search . '%')
+                        ->orWhere('request_number', 'like', '%' . $search . '%')
                         ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
@@ -263,7 +264,7 @@ class AdminController extends Controller
     {
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('id', 'service_id', 'client_id', 'uploaded_file', 'amount', 'status', 'created_at')
+        $requests = \App\Models\Journal\Request::select('id', 'request_number', 'service_id', 'client_id', 'uploaded_file', 'amount', 'status', 'created_at')
             ->where('status', 'approved')
             ->with([
                 'service' => function ($query) {
@@ -276,6 +277,7 @@ class AdminController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(uploaded_file, '/', -1)"), 'like', '%' . $search . '%')
+                        ->orWhere('request_number', 'like', '%' . $search . '%')
                         ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
@@ -297,7 +299,7 @@ class AdminController extends Controller
     {
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('id', 'service_id', 'client_id', 'uploaded_file', 'amount', 'message', 'status', 'created_at')
+        $requests = \App\Models\Journal\Request::select('id', 'request_number', 'service_id', 'client_id', 'uploaded_file', 'amount', 'message', 'status', 'created_at')
             ->where('status', 'rejected')
             ->with([
                 'service' => function ($query) {
@@ -310,6 +312,7 @@ class AdminController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(uploaded_file, '/', -1)"), 'like', '%' . $search . '%')
+                        ->orWhere('request_number', 'like', '%' . $search . '%')
                         ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('service', function ($q) use ($search) {
                             $q->where('name', 'like', '%' . $search . '%');
@@ -335,7 +338,7 @@ class AdminController extends Controller
             ->where('status', 'pending')
             ->with([
                 'request' => function ($query) {
-                    $query->select('id', 'client_id', 'service_id');
+                    $query->select('id', 'client_id', 'service_id', 'request_number');
                     $query->with([
                         'user' => function ($query) {
                             $query->select('id', 'last_name', 'first_name');
@@ -352,6 +355,9 @@ class AdminController extends Controller
                         ->orWhereHas('user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('request', function ($q) use ($search) {
+                            $q->where('request_number', 'like', '%' . $search . '%');
                         })
                         ->orWhereHas('request.user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
@@ -387,7 +393,7 @@ class AdminController extends Controller
             ->where('status', 'approved')
             ->with([
                 'request' => function ($query) {
-                    $query->select('id', 'client_id', 'service_id');
+                    $query->select('id', 'client_id', 'service_id', 'request_number');
                     $query->with([
                         'user' => function ($query) {
                             $query->select('id', 'last_name', 'first_name');
@@ -405,6 +411,9 @@ class AdminController extends Controller
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
                         })
+                        ->orWhereHas('request', function ($q) use ($search) {
+                            $q->where('request_number', 'like', '%' . $search . '%');
+                        })
                         ->orWhereHas('request.user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
@@ -413,13 +422,8 @@ class AdminController extends Controller
             })
             ->paginate(10);
 
-        $editors = User::select('id', 'last_name', 'first_name')
-            ->where('role', 'editor')
-            ->get();
-
         return Inertia::render("Journal/Admin/AssignEditor/Approved", [
-            "assigns" => $assigns,
-            "editors" => $editors
+            "assigns" => $assigns
         ]);
     }
 
@@ -431,7 +435,7 @@ class AdminController extends Controller
             ->where('status', 'rejected')
             ->with([
                 'request' => function ($query) {
-                    $query->select('id', 'client_id', 'service_id');
+                    $query->select('id', 'client_id', 'service_id', 'request_number');
                     $query->with([
                         'user' => function ($query) {
                             $query->select('id', 'last_name', 'first_name');
@@ -448,6 +452,9 @@ class AdminController extends Controller
                         ->orWhereHas('user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('request', function ($q) use ($search) {
+                            $q->where('request_number', 'like', '%' . $search . '%');
                         })
                         ->orWhereHas('request.user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
@@ -466,7 +473,7 @@ class AdminController extends Controller
     {
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('id', 'client_id', 'service_id', 'amount')
+        $requests = \App\Models\Journal\Request::select('id', 'client_id', 'service_id', 'request_number', 'amount')
             ->whereHas('assign_editor', function ($query) {
                 $query->whereNotNull('published_at');
             })
@@ -489,7 +496,8 @@ class AdminController extends Controller
             ])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('amount', 'like', '%' . $search . '%')
+                    $q->where('request_number', 'like', '%' . $search . '%')
+                        ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
@@ -513,11 +521,28 @@ class AdminController extends Controller
         ]);
     }
 
+    public function publishDocumentPay(Request $request)
+    {
+        $request->validate([
+            'reference_number' => ['required'],
+        ]);
+
+        $payment_method_id = PaymentMethod::where('type', 'cash')
+            ->first()->id;
+
+        Payment::create([
+            'request_id' => $request->request_id,
+            'payment_method_id' => $payment_method_id,
+            'reference_number' => $request->reference_number,
+            'status' => 'approved'
+        ]);
+    }
+
     public function publishDocumentPaid(Request $request)
     {
         $search = $request->input('search');
 
-        $requests = \App\Models\Journal\Request::select('id', 'client_id', 'service_id', 'amount')
+        $requests = \App\Models\Journal\Request::select('id', 'client_id', 'service_id', 'request_number', 'amount')
             ->whereHas('assign_editor', function ($query) {
                 $query->whereNotNull('published_at');
             })
@@ -542,7 +567,8 @@ class AdminController extends Controller
             ])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
-                    $q->where('amount', 'like', '%' . $search . '%')
+                    $q->where('request_number', 'like', '%' . $search . '%')
+                        ->orWhere('amount', 'like', '%' . $search . '%')
                         ->orWhereHas('user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
@@ -665,7 +691,7 @@ class AdminController extends Controller
                     $query->select('request_id', 'payment_method_id', 'reference_number', 'receipt', 'status', 'created_at');
                     $query->with([
                         'payment_method' => function ($query) {
-                            $query->select('id', 'name');
+                            $query->select('id', 'name', 'type');
                         }
                     ]);
                 }

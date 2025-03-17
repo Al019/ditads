@@ -140,6 +140,7 @@ const Pending = () => {
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
+              <TableHead>Request Number</TableHead>
               <TableHead>Client Name</TableHead>
               <TableHead>Service</TableHead>
               <TableHead>Uploaded Document</TableHead>
@@ -154,6 +155,9 @@ const Pending = () => {
                 <TableRow key={index}>
                   <TableCell className="font-medium">
                     {index + 1}
+                  </TableCell>
+                  <TableCell>
+                    {request.request_number}
                   </TableCell>
                   <TableCell>
                     {request.user.first_name} {request.user.last_name}
@@ -196,7 +200,7 @@ const Pending = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>
@@ -229,7 +233,7 @@ const Pending = () => {
           {status === 'approved' && (
             <div className="space-y-4">
               <div className="space-y-1">
-                <Label>Upload a Edited File</Label>
+                <Label>Upload Edited File</Label>
                 <div className=" flex items-center space-x-4 rounded-md border p-4">
                   <img src={Word} className="size-8" />
                   <div className="flex-1 space-y-1">
@@ -256,7 +260,7 @@ const Pending = () => {
                 <InputError message={errors.edited_file} />
               </div>
               <div className="space-y-1">
-                <Label>Assign a Editor</Label>
+                <Label>Assign Editor</Label>
                 <Select value={data.editor_id} onValueChange={(val) => setData('editor_id', val)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select" />

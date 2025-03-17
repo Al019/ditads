@@ -96,6 +96,7 @@ const Paid = () => {
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
+              <TableHead>Request Number</TableHead>
               <TableHead>Client Name</TableHead>
               <TableHead>Editor Name</TableHead>
               <TableHead>Service</TableHead>
@@ -111,6 +112,9 @@ const Paid = () => {
                 <TableRow key={index}>
                   <TableCell className="font-medium">
                     {index + 1}
+                  </TableCell>
+                  <TableCell>
+                    {request.request_number}
                   </TableCell>
                   <TableCell>
                     {request.user.first_name} {request.user.last_name}
@@ -139,7 +143,7 @@ const Paid = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => window.open(route('journal.download', { file: `published_files/${request.assign_editor.published_file}` }), '_blank')} className="cursor-pointer">
                           <Download />Download Document
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -149,7 +153,7 @@ const Paid = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center">
+                <TableCell colSpan={9} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>

@@ -58,6 +58,20 @@ const Unpaid = () => {
     style: "currency",
     currency: "PHP",
   }).format(parseFloat(amount))
+  const [open, setOpen] = useState(false)
+  const { data, processing, errors, setData, post, reset } = useForm({
+    request_id: null,
+    reference_number: ""
+  })
+
+  const handleOpen = (request_id) => {
+    if (request_id) {
+      setData('request_id', request_id)
+    } else {
+      reset()
+    }
+    setOpen(!open)
+  }
 
   const searchTimeoutRef = useRef(null);
 
@@ -86,6 +100,14 @@ const Unpaid = () => {
     router.get(url, {}, { preserveState: true })
   }
 
+  const handlePay = () => {
+    post(route('admin.published.document.pay'), {
+      onSuccess: () => {
+        handleOpen()
+      }
+    })
+  }
+
   return (
     <AuthenticatedLayout title="Unpaid Published Documents">
       <div className='space-y-4'>
@@ -96,6 +118,7 @@ const Unpaid = () => {
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
+              <TableHead>Request Number</TableHead>
               <TableHead>Client Name</TableHead>
               <TableHead>Editor Name</TableHead>
               <TableHead>Service</TableHead>
@@ -111,6 +134,9 @@ const Unpaid = () => {
                 <TableRow key={index}>
                   <TableCell className="font-medium">
                     {index + 1}
+                  </TableCell>
+                  <TableCell>
+                    {request.request_number}
                   </TableCell>
                   <TableCell>
                     {request.user.first_name} {request.user.last_name}
@@ -139,7 +165,11 @@ const Unpaid = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => window.open(route('journal.download', { file: `published_files/${request.assign_editor.published_file}` }), '_blank')} className="cursor-pointer">
+                          <Download />Download Document
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleOpen(request.id)} className="cursor-pointer">
                           <HandCoins />Pay
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -149,7 +179,7 @@ const Unpaid = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center">
+                <TableCell colSpan={9} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>
@@ -173,6 +203,24 @@ const Unpaid = () => {
           </div>
         )}
       </div>
+
+      <Dialog open={open} onOpenChange={() => handleOpen()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Pay with Cash</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-1">
+            <Label>OR Number</Label>
+            <Input value={data.reference_number} onChange={(e) => setData('reference_number', e.target.value)} />
+            <InputError message={errors.reference_number} />
+          </div>
+          <DialogFooter>
+            <Button onClick={handlePay} disabled={processing}>
+              Pay
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AuthenticatedLayout>
   )
 }

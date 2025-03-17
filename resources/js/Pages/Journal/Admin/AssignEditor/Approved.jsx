@@ -92,8 +92,9 @@ const Approved = () => {
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
-              <TableHead>Editor Name</TableHead>
+              <TableHead>Request Number</TableHead>
               <TableHead>Client Name</TableHead>
+              <TableHead>Editor Name</TableHead>
               <TableHead>Edited Document</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
@@ -106,10 +107,13 @@ const Approved = () => {
                     {index + 1}
                   </TableCell>
                   <TableCell>
-                    {assign.user.first_name} {assign.user.last_name}
+                    {assign.request.request_number}
                   </TableCell>
                   <TableCell>
                     {assign.request.user.first_name} {assign.request.user.last_name}
+                  </TableCell>
+                  <TableCell>
+                    {assign.user.first_name} {assign.user.last_name}
                   </TableCell>
                   <TableCell>
                     {assign.edited_file.split('/').pop()}
@@ -133,7 +137,7 @@ const Approved = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>

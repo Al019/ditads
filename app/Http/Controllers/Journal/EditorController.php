@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Journal\AssignEditor;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Str;
 
@@ -27,7 +28,7 @@ class EditorController extends Controller
             ->where('status', 'pending')
             ->with([
                 'request' => function ($query) {
-                    $query->select('id', 'client_id', 'service_id');
+                    $query->select('id', 'client_id', 'service_id', 'request_number');
                     $query->with([
                         'user' => function ($query) {
                             $query->select('id', 'last_name', 'first_name');
@@ -41,7 +42,9 @@ class EditorController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(edited_file, '/', -1)"), 'like', '%' . $search . '%')
-                        ->orWhereHas('request.user', function ($q) use ($search) {
+                        ->orWhereHas('request', function ($q) use ($search) {
+                            $q->where('request_number', 'like', '%' . $search . '%');
+                        })->orWhereHas('request.user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
                         })->orWhereHas('request.service', function ($q) use ($search) {
@@ -61,7 +64,7 @@ class EditorController extends Controller
         $assign = AssignEditor::findOrFail($request->id);
 
         $assign->update([
-            'edited_at' => $request->status === 'approved' ? now() : null,
+            'edited_at' => $request->status === 'approved' ? Carbon::now()->setTimezone('Asia/Manila') : null,
             'status' => $request->status
         ]);
     }
@@ -77,7 +80,7 @@ class EditorController extends Controller
             ->where('status', 'approved')
             ->with([
                 'request' => function ($query) {
-                    $query->select('id', 'client_id', 'service_id');
+                    $query->select('id', 'client_id', 'service_id', 'request_number');
                     $query->with([
                         'user' => function ($query) {
                             $query->select('id', 'last_name', 'first_name');
@@ -91,7 +94,9 @@ class EditorController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(edited_file, '/', -1)"), 'like', '%' . $search . '%')
-                        ->orWhereHas('request.user', function ($q) use ($search) {
+                        ->orWhereHas('request', function ($q) use ($search) {
+                            $q->where('request_number', 'like', '%' . $search . '%');
+                        })->orWhereHas('request.user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
                         })->orWhereHas('request.service', function ($q) use ($search) {
@@ -117,7 +122,7 @@ class EditorController extends Controller
             ->where('status', 'rejected')
             ->with([
                 'request' => function ($query) {
-                    $query->select('id', 'client_id', 'service_id');
+                    $query->select('id', 'client_id', 'service_id', 'request_number');
                     $query->with([
                         'user' => function ($query) {
                             $query->select('id', 'last_name', 'first_name');
@@ -131,7 +136,9 @@ class EditorController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(edited_file, '/', -1)"), 'like', '%' . $search . '%')
-                        ->orWhereHas('request.user', function ($q) use ($search) {
+                        ->orWhereHas('request', function ($q) use ($search) {
+                            $q->where('request_number', 'like', '%' . $search . '%');
+                        })->orWhereHas('request.user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
                         })->orWhereHas('request.service', function ($q) use ($search) {
@@ -158,7 +165,7 @@ class EditorController extends Controller
             ->whereNull('published_at')
             ->with([
                 'request' => function ($query) {
-                    $query->select('id', 'client_id', 'service_id');
+                    $query->select('id', 'client_id', 'service_id', 'request_number');
                     $query->with([
                         'user' => function ($query) {
                             $query->select('id', 'last_name', 'first_name');
@@ -172,6 +179,9 @@ class EditorController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(edited_file, '/', -1)"), 'like', '%' . $search . '%')
+                        ->orWhereHas('request', function ($q) use ($search) {
+                            $q->where('request_number', 'like', '%' . $search . '%');
+                        })
                         ->orWhereHas('request.user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
@@ -203,7 +213,7 @@ class EditorController extends Controller
 
         $assign->update([
             'published_file' => $filename,
-            'published_at' => now(),
+            'published_at' => Carbon::now()->setTimezone('Asia/Manila'),
         ]);
     }
 
@@ -219,7 +229,7 @@ class EditorController extends Controller
             ->whereNotNull('published_at')
             ->with([
                 'request' => function ($query) {
-                    $query->select('id', 'client_id', 'service_id');
+                    $query->select('id', 'client_id', 'service_id', 'request_number');
                     $query->with([
                         'user' => function ($query) {
                             $query->select('id', 'last_name', 'first_name');
@@ -233,6 +243,9 @@ class EditorController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where(DB::raw("SUBSTRING_INDEX(published_file, '/', -1)"), 'like', '%' . $search . '%')
+                        ->orWhereHas('request', function ($q) use ($search) {
+                            $q->where('request_number', 'like', '%' . $search . '%');
+                        })
                         ->orWhereHas('request.user', function ($q) use ($search) {
                             $q->where('last_name', 'like', '%' . $search . '%')
                                 ->orWhere('first_name', 'like', '%' . $search . '%');
