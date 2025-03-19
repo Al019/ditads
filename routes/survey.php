@@ -23,6 +23,7 @@ Route::middleware(['auth', 'enumerator', 'verified'])->group(function () {
   Route::get('/enumerator/surveys', [EnumeratorController::class, 'getSurvey'])->name('enumerator.survey');
   Route::get('/enumerator/surveys/view', [EnumeratorController::class, 'viewSurvey'])->name('enumerator.survey.view');
   Route::get('/api/enumerator/surveys/view', [EnumeratorController::class, 'apiViewSurvey'])->name('api.enumerator.survey.view');
+  Route::post('/api/enumerator/surveys/submit/response', [EnumeratorController::class, 'submitResponse'])->name('api.enumerator.submit.response');
 
 });
 

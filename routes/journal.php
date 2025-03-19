@@ -3,7 +3,6 @@
 use App\Http\Controllers\Journal\AdminController;
 use App\Http\Controllers\Journal\ClientController;
 use App\Http\Controllers\Journal\EditorController;
-use App\Models\Journal\Notification;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'admin', 'verified'])->group(function () {

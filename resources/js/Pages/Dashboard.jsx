@@ -63,7 +63,7 @@ const Dashboard = () => {
         </TabsList>
         <TabsContent value="survey">
           <div className="pt-2">
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-4 gap-4">
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">
@@ -95,7 +95,7 @@ const Dashboard = () => {
         </TabsContent>
         <TabsContent value="journal">
           <div className="pt-2 space-y-4">
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-4 gap-4">
               <Card>
                 <CardHeader>
                   <div className="flex items-center justify-between">

@@ -1,7 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
 import { useEffect, useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/Components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/Components/ui/card"
 import { usePage } from "@inertiajs/react"
 import axios from "axios"
 import { Label } from "@/components/ui/label"
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/Components/ui/textarea"
 import { Button } from "@/Components/ui/button"
+import { toast } from "sonner"
 
 const tabs = ["Questions", "Responses"]
 
@@ -26,6 +27,9 @@ const View = () => {
   const [activeTab, setActiveTab] = useState(tabs[0])
   const [survey, setSurvey] = useState([])
   const [answer, setAnswer] = useState([])
+  const [processing, setProcessing] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [validationErrors, setValidationErrors] = useState([])
 
   useEffect(() => {
     getSurvey()
@@ -61,6 +65,7 @@ const View = () => {
       ]
 
       localStorage.setItem(`answers_${survey.id}`, JSON.stringify(newAnswers))
+      setValidationErrors((prevErrors) => prevErrors.filter((id) => id !== questionId))
       return newAnswers
     })
   }
@@ -88,6 +93,7 @@ const View = () => {
       }
 
       localStorage.setItem(`answers_${survey.id}`, JSON.stringify(updatedAnswers))
+      setValidationErrors((prevErrors) => prevErrors.filter((id) => id !== questionId))
       return updatedAnswers
     })
   }
@@ -106,19 +112,54 @@ const View = () => {
           },
         ]
         localStorage.setItem(`answers_${survey.id}`, JSON.stringify(newAnswers))
+        setValidationErrors((prevErrors) => prevErrors.filter((id) => id !== questionId))
         return newAnswers
       } else {
         localStorage.setItem(`answers_${survey.id}`, JSON.stringify(updatedAnswers))
+        setValidationErrors((prevErrors) => prevErrors.filter((id) => id !== questionId))
         return updatedAnswers
       }
     })
+  }
+
+  const handleSubmit = async () => {
+    const requiredQuestions = survey.question.filter(q => q.required === 1)
+    const unansweredQuestions = requiredQuestions.filter(q => !answer.some(a => a.questionId === q.id))
+
+    if (unansweredQuestions.length > 0) {
+      setValidationErrors(unansweredQuestions.map(q => q.id))
+      toast.warning("Please answer all required questions.")
+      return
+    }
+
+    setProcessing(true)
+    await axios.post(route('api.enumerator.submit.response'), { survey_id: survey.id, answer })
+      .then(() => {
+        localStorage.removeItem(`answers_${survey.id}`)
+        setAnswer([])
+        setValidationErrors([])
+        toast.success("Response submitted successfully.")
+        setSubmitted(true)
+      })
+      .catch((error) => {
+        if (error.response) {
+          toast.error("Failed to submit response. Please try again.")
+        } else if (error.request) {
+          toast.error("Network error. Please check your connection.")
+        } else {
+          toast.error("An unexpected error occurred. Please try again.")
+        }
+      })
+      .finally(() => {
+        setProcessing(false)
+      })
   }
 
   return (
     <Tabs defaultValue={activeTab}>
       <AuthenticatedLayout title={survey.title} button={
         activeTab === 'Questions' && (
-          <Button>
+          <Button onClick={handleSubmit} disabled={processing}>
             Submit
           </Button>
         )
@@ -148,68 +189,83 @@ const View = () => {
                   </CardDescription>
                 </CardContent>
               )}
+              {submitted && (
+                <CardFooter>
+                  <div className="w-full space-y-4">
+                    <p className="text-sm font-normal">
+                      Your response has been recorded.
+                    </p>
+                    <div className="flex justify-end">
+                      <Button onClick={() => setSubmitted(false)}>
+                        Submit another response
+                      </Button>
+                    </div>
+                  </div>
+                </CardFooter>
+              )}
             </Card>
-            {survey.question?.map((question, qIndex) => (
-              <Card key={qIndex}>
-                <CardHeader>
-                  <CardDescription className="text-xs">Question {qIndex + 1} {question.required === 1 && <span className="text-destructive text-sm">*</span>}</CardDescription>
-                  <CardTitle>
-                    {question.text}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {question.type === 'radio' && (
-                    <RadioGroup onValueChange={(val) => handleAnswerChange(question.id, val)}>
+            {!submitted &&
+              survey.question?.map((question, qIndex) => (
+                <Card key={qIndex} className={validationErrors.includes(question.id) ? 'ring-2 ring-destructive' : ''}>
+                  <CardHeader>
+                    <CardDescription className="text-xs">Question {qIndex + 1} {question.required === 1 && <span className="text-destructive text-sm">*</span>}</CardDescription>
+                    <CardTitle>
+                      {question.text}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {question.type === 'radio' && (
+                      <RadioGroup onValueChange={(val) => handleAnswerChange(question.id, val)}>
+                        <div className="grid grid-cols-2 gap-4">
+                          {question.option?.map((option, oIndex) => (
+                            <div key={oIndex} className="flex items-center space-x-2">
+                              <RadioGroupItem checked={answer.some(
+                                (ans) =>
+                                  ans.questionId === question.id &&
+                                  ans.option.some((opt) => opt.optionId === option.id)
+                              )} value={option.id} id={`radio-${oIndex}`} />
+                              <Label htmlFor={`radio-${oIndex}`}>{option.text}</Label>
+                            </div>
+                          ))}
+                        </div>
+                      </RadioGroup>
+                    )}
+                    {question.type === 'checkbox' && (
                       <div className="grid grid-cols-2 gap-4">
                         {question.option?.map((option, oIndex) => (
                           <div key={oIndex} className="flex items-center space-x-2">
-                            <RadioGroupItem checked={answer.some(
+                            <Checkbox checked={answer.some(
                               (ans) =>
                                 ans.questionId === question.id &&
                                 ans.option.some((opt) => opt.optionId === option.id)
-                            )} value={option.id} id={`radio-${oIndex}`} />
-                            <Label htmlFor={`radio-${oIndex}`}>{option.text}</Label>
+                            )} onCheckedChange={(val) => handleCheckboxChange(question.id, option, val)} id={`checkbox-${oIndex}`} />
+                            <Label htmlFor={`checkbox-${oIndex}`}>{option.text}</Label>
                           </div>
                         ))}
                       </div>
-                    </RadioGroup>
-                  )}
-                  {question.type === 'checkbox' && (
-                    <div className="grid grid-cols-2 gap-4">
-                      {question.option?.map((option, oIndex) => (
-                        <div key={oIndex} className="flex items-center space-x-2">
-                          <Checkbox checked={answer.some(
-                            (ans) =>
-                              ans.questionId === question.id &&
-                              ans.option.some((opt) => opt.optionId === option.id)
-                          )} onCheckedChange={(val) => handleCheckboxChange(question.id, option, val)} id={`checkbox-${oIndex}`} />
-                          <Label htmlFor={`checkbox-${oIndex}`}>{option.text}</Label>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {question.type === 'select' && (
-                    <div className="grid grid-cols-2">
-                      <Select value={answer.find(ans => ans.questionId === question.id)?.option[0].optionId} onValueChange={(val) => handleAnswerChange(question.id, val)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {question.option?.map((option, oIndex) => (
-                              <SelectItem key={oIndex} value={option.id}>{option.text}</SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                  {question.type === 'input' && (
-                    <Textarea value={answer.find(ans => ans.questionId === question.id)?.text} onChange={(e) => handleInputChange(question.id, question.option[0], e.target.value)} />
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+                    )}
+                    {question.type === 'select' && (
+                      <div className="grid grid-cols-2">
+                        <Select value={answer.find(ans => ans.questionId === question.id)?.option[0].optionId} onValueChange={(val) => handleAnswerChange(question.id, val)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              {question.option?.map((option, oIndex) => (
+                                <SelectItem key={oIndex} value={option.id}>{option.text}</SelectItem>
+                              ))}
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    {question.type === 'input' && (
+                      <Textarea value={answer.find(ans => ans.questionId === question.id)?.text} onChange={(e) => handleInputChange(question.id, question.option[0], e.target.value)} />
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
           </div>
         </TabsContent>
       </AuthenticatedLayout>

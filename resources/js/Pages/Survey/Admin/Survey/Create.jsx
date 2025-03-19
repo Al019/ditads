@@ -202,7 +202,7 @@ const Create = () => {
       }>
         <TabsContent value="Questions">
           <div className="max-w-[800px] mx-auto space-y-4 mb-40">
-            <Card onClick={() => setSelected(0)} className={selected === 0 ? 'ring-2 ring-green-500' : ''}>
+            <Card onClick={() => setSelected(0)} className={selected === 0 ? 'ring-2 ring-primary' : ''}>
               <CardHeader>
                 <div className="space-y-1">
                   <Label>Title</Label>
@@ -217,7 +217,7 @@ const Create = () => {
               </CardContent>
             </Card>
             {survey.questions.map((question, qIndex) => (
-              <Card key={qIndex} ref={el => questionRefs.current[qIndex] = el} onClick={() => setSelected(qIndex + 1)} className={selected === qIndex + 1 ? 'ring-2 ring-green-500' : ''}>
+              <Card key={qIndex} ref={el => questionRefs.current[qIndex] = el} onClick={() => setSelected(qIndex + 1)} className={selected === qIndex + 1 ? 'ring-2 ring-primary' : ''}>
                 <CardHeader>
                   <div className="space-y-1">
                     <Label>Question {qIndex + 1}</Label>

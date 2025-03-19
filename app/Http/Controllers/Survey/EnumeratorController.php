@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Survey;
 
 use App\Http\Controllers\Controller;
+use App\Models\Survey\Answer;
+use App\Models\Survey\AnswerOption;
+use App\Models\Survey\Response;
 use App\Models\Survey\Survey;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -85,5 +88,30 @@ class EnumeratorController extends Controller
             ->first();
 
         return response()->json($survey);
+    }
+
+    public function submitResponse(Request $request)
+    {
+        $user_id = auth()->user()->id;
+
+        $response = Response::create([
+            'survey_id' => $request->survey_id,
+            'enumerator_id' => $user_id,
+        ]);
+
+        foreach ($request['answer'] as $answerData) {
+            $answer = Answer::create(attributes: [
+                'response_id' => $response->id,
+                'question_id' => $answerData['questionId'],
+                'text' => is_array($answerData['text']) ? implode(', ', $answerData['text']) : $answerData['text'],
+            ]);
+
+            foreach ($answerData['option'] as $answerOptionData) {
+                AnswerOption::create([
+                    'answer_id' => $answer->id,
+                    'option_id' => $answerOptionData['optionId'],
+                ]);
+            }
+        }
     }
 }
