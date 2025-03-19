@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Journal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Journal\AssignEditor;
+use App\Models\Journal\Commission;
 use App\Models\Journal\Payment;
 use App\Models\Journal\PaymentMethod;
 use App\Models\Journal\Service;
@@ -44,6 +45,7 @@ class AdminController extends Controller
         Service::create([
             'name' => $request->name,
             'price' => $request->price,
+            'commission_price_rate' => $request->commission_price_rate === 'none' ? null : $request->commission_price_rate
         ]);
     }
 
@@ -57,6 +59,7 @@ class AdminController extends Controller
         Service::where('id', $request->id)->update([
             'name' => $request->name,
             'price' => $request->price,
+            'commission_price_rate' => $request->commission_price_rate === 'none' ? null : $request->commission_price_rate
         ]);
     }
 
@@ -288,6 +291,7 @@ class AdminController extends Controller
                         });
                 });
             })
+            ->latest()
             ->paginate(10);
 
         return Inertia::render("Journal/Admin/Request/Approved", [
@@ -323,6 +327,7 @@ class AdminController extends Controller
                         });
                 });
             })
+            ->latest()
             ->paginate(10);
 
         return Inertia::render("Journal/Admin/Request/Rejected", [
@@ -365,6 +370,7 @@ class AdminController extends Controller
                         });
                 });
             })
+            ->latest()
             ->paginate(10);
 
         $editors = User::select('id', 'last_name', 'first_name')
@@ -421,6 +427,7 @@ class AdminController extends Controller
                         });
                 });
             })
+            ->latest()
             ->paginate(10);
 
         return Inertia::render("Journal/Admin/AssignEditor/Approved", [
@@ -463,6 +470,7 @@ class AdminController extends Controller
                         });
                 });
             })
+            ->latest()
             ->paginate(10);
 
         $editors = User::select('id', 'last_name', 'first_name')
@@ -542,6 +550,23 @@ class AdminController extends Controller
             'reference_number' => $request->reference_number,
             'status' => 'approved'
         ]);
+
+        $req = \App\Models\Journal\Request::findOrFail($request->request_id);
+
+        $editor_id = AssignEditor::where('request_id', $req->id)
+            ->first()->editor_id;
+
+        if ($req->commission_amount_rate) {
+            $amount = floatval($req->amount);
+            $commissionRate = intval($req->commission_amount_rate);
+            $commissionAmount = $amount * ($commissionRate / 100);
+
+            Commission::create([
+                'request_id' => $req->id,
+                'editor_id' => $editor_id,
+                'commission_amount' => $commissionAmount,
+            ]);
+        }
     }
 
     public function publishDocumentPaid(Request $request)
@@ -663,6 +688,23 @@ class AdminController extends Controller
             $payment->update([
                 'status' => $request->status
             ]);
+
+            $req = \App\Models\Journal\Request::findOrFail($request->id);
+
+            $editor_id = AssignEditor::where('request_id', $req->id)
+                ->first()->editor_id;
+
+            if ($req->commission_amount_rate) {
+                $amount = floatval($req->amount);
+                $commissionRate = intval($req->commission_amount_rate);
+                $commissionAmount = $amount * ($commissionRate / 100);
+
+                Commission::create([
+                    'request_id' => $req->id,
+                    'editor_id' => $editor_id,
+                    'commission_amount' => $commissionAmount,
+                ]);
+            }
         } else if ($request->status === 'rejected') {
             $request->validate([
                 'message' => ['required'],

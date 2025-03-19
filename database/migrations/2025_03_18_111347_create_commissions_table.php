@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('commissions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->decimal('price');
-            $table->string('commission_price_rate')->nullable();
-            $table->boolean('status')->default(1);
+            $table->foreignId('request_id')->constrained('requests');
+            $table->foreignId('editor_id')->constrained('users');
+            $table->decimal('commission_amount');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('commissions');
     }
 };

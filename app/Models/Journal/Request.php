@@ -18,6 +18,7 @@ class Request extends Model
         'request_number',
         'uploaded_file',
         'amount',
+        'commission_amount_rate',
         'message',
         'status',
     ];
@@ -40,5 +41,10 @@ class Request extends Model
     public function assign_editor(): HasOne
     {
         return $this->hasOne(AssignEditor::class, 'request_id');
+    }
+
+    public function commission(): HasMany
+    {
+        return $this->hasMany(Commission::class, 'request_id');
     }
 }

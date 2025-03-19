@@ -15,6 +15,7 @@ import { NavAdmin } from "./nav-admin"
 import { NavEnumerator } from "./nav-enumerator"
 import { NavClient } from "./nav-client"
 import NavEditor from "./nav-editor"
+import { ModeToggle } from "./mode-toggle"
 
 export function AppSidebar({
   ...props
@@ -26,23 +27,22 @@ export function AppSidebar({
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <Link href="/" as="button" className="w-full">
-              <SidebarMenuButton
-                size="lg"
-                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <img src={Logo} className="object-contain" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
-                    DITADS
-                  </span>
-                  <span className="truncate text-xs capitalize">
-                    {user.role === 'admin' ? 'Administrator' : user.role}
-                  </span>
-                </div>
-              </SidebarMenuButton>
-            </Link>
+            <SidebarMenuButton
+              size="lg"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-default">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                <img src={Logo} className="object-contain" />
+              </div>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">
+                  DITADS
+                </span>
+                <span className="truncate text-xs capitalize">
+                  {user.role === 'admin' ? 'Administrator' : user.role}
+                </span>
+              </div>
+              <ModeToggle />
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

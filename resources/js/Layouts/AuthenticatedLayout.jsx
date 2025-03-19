@@ -1,6 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import { ModeToggle } from "@/Components/mode-toggle"
 import { useSecurity } from "@/Components/security-modal"
+import { Button } from "@/Components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import {
     SidebarInset,
@@ -8,12 +9,23 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { usePage } from "@inertiajs/react"
-import { useEffect } from "react"
+import { Bell } from "lucide-react"
+import { useEffect, useState } from "react"
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet"
+import axios from "axios"
 
 export default function AuthenticatedLayout({ children, title, button, tab }) {
     const user = usePage().props.auth.user;
     const { setOpen } = useSecurity()
     const currentPath = usePage().url
+    const [openNotif, setOpenNotif] = useState(false)
 
     useEffect(() => {
         const securityAlert = () => {
@@ -50,7 +62,9 @@ export default function AuthenticatedLayout({ children, title, button, tab }) {
                                             <Separator orientation="vertical" className="h-4" />
                                         </div>
                                     )}
-                                    <ModeToggle />
+                                    <Button onClick={() => setOpenNotif(true)} size="icon" variant="outline">
+                                        <Bell />
+                                    </Button>
                                 </div>
                             </div>
                         </header>
@@ -61,11 +75,21 @@ export default function AuthenticatedLayout({ children, title, button, tab }) {
                         )}
                         <Separator className="w-full" />
                     </div>
-                    <div className="flex flex-1 flex-col gap-4 p-4">
+                    <div className="w-full max-w-[1280px] mx-auto flex flex-1 flex-col gap-4 p-4">
                         {children}
                     </div>
                 </SidebarInset>
             </SidebarProvider>
+
+            <Sheet open={openNotif} onOpenChange={() => setOpenNotif(false)}>
+                <SheetContent>
+                    <SheetHeader>
+                        <SheetTitle>Notifications</SheetTitle>
+                    </SheetHeader>
+
+                </SheetContent>
+            </Sheet>
+
         </div>
     );
 }

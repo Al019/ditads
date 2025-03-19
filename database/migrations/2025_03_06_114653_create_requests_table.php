@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('request_number');
             $table->string('uploaded_file');
             $table->decimal('amount');
+            $table->string('commission_amount_rate')->nullable();
             $table->longText('message')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();

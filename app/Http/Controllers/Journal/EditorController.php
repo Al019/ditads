@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Journal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Journal\AssignEditor;
+use App\Models\Journal\Commission;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -12,9 +13,31 @@ use Str;
 
 class EditorController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        return Inertia::render("Journal/Editor/Dashboard");
+        $user_id = $request->user()->id;
+
+        $pendingAssign = AssignEditor::where('editor_id', $user_id)
+            ->where('status', 'pending')
+            ->count();
+        $publishedDocument = AssignEditor::where('editor_id', $user_id)
+            ->where('status', 'approved')
+            ->whereNotNull('published_at')
+            ->count();
+        $requestCount = [$pendingAssign, $publishedDocument];
+
+        $commissions = Commission::select(
+            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+            DB::raw("SUM(commission_amount) as total_amount")
+        )
+            ->groupBy('month')
+            ->orderBy('month', 'asc')
+            ->get();
+
+        return Inertia::render("Journal/Editor/Dashboard", [
+            "requestCount" => $requestCount,
+            "commissions" => $commissions
+        ]);
     }
 
     public function assignDocumentPending(Request $request)

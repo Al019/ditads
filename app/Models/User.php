@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Journal\AssignEditor;
+use App\Models\Journal\Commission;
 use App\Models\Journal\Request;
 use App\Models\Survey\Response;
 use App\Models\Survey\Survey;
@@ -90,5 +91,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function assign_editor(): HasOne
     {
         return $this->hasOne(AssignEditor::class, 'editor_id');
+    }
+
+    public function commission(): HasMany
+    {
+        return $this->hasMany(Commission::class, 'editor_id');
     }
 }

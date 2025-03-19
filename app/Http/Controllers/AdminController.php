@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Journal\AssignEditor;
 use App\Models\User;
+use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Mail;
@@ -14,7 +16,37 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        return Inertia::render("Dashboard");
+        $enumerator = User::where('role', 'enumerator')
+            ->count();
+        $viewer = User::where('role', 'viewer')
+            ->count();
+        $editor = User::where('role', 'editor')
+            ->count();
+        $client = User::where('role', 'client')
+            ->count();
+        $userCount = [$enumerator, $viewer, $editor, $client];
+
+        $pendingRequest = \App\Models\Journal\Request::where('status', 'pending')
+            ->count();
+        $publishedDocument = AssignEditor::whereNotNull('published_at')
+            ->count();
+        $requestCount = [$pendingRequest, $publishedDocument];
+
+        $sales = \App\Models\Journal\Request::select(
+            DB::raw("DATE_FORMAT(payments.created_at, '%Y-%m') as month"),
+            DB::raw("SUM(amount) as total_amount")
+        )
+            ->join('payments', 'requests.id', '=', 'payments.request_id')
+            ->where('payments.status', 'approved')
+            ->groupBy('month')
+            ->orderBy('month', 'asc')
+            ->get();
+
+        return Inertia::render("Dashboard", [
+            "userCount" => $userCount,
+            "requestCount" => $requestCount,
+            "sales" => $sales,
+        ]);
     }
 
     public function getEnumerator(Request $request)

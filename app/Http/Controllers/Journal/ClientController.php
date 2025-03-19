@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Journal;
 
 use App\Http\Controllers\Controller;
+use App\Models\Journal\AssignEditor;
+use App\Models\Journal\Commission;
+use App\Models\Journal\Notification;
 use App\Models\Journal\Payment;
 use App\Models\Journal\PaymentMethod;
 use App\Models\Journal\Receipt;
 use App\Models\Journal\Service;
+use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -16,9 +20,26 @@ use function Laravel\Prompts\select;
 
 class ClientController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        return Inertia::render("Journal/Client/Dashboard");
+        $user_id = $request->user()->id;
+
+        $pendingRequest = \App\Models\Journal\Request::where('client_id', $user_id)
+            ->where('status', 'pending')
+            ->count();
+        $publishedDocument = \App\Models\Journal\Request::where('client_id', $user_id)
+            ->whereHas('assign_editor', function ($query) {
+                $query->whereNotNull('published_at');
+            })
+            ->whereHas('payment', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->count();
+        $requestCount = [$pendingRequest, $publishedDocument];
+
+        return Inertia::render("Journal/Client/Dashboard", [
+            "requestCount" => $requestCount,
+        ]);
     }
 
     public function getPendingRequest(Request $request)
@@ -91,7 +112,8 @@ class ClientController extends Controller
             'service_id' => $service->id,
             'request_number' => $requestNumber,
             'uploaded_file' => $filename,
-            'amount' => $service->price
+            'amount' => $service->price,
+            'commission_amount_rate' => $service->commission_price_rate ? $service->commission_price_rate : null
         ]);
     }
 
@@ -269,6 +291,8 @@ class ClientController extends Controller
 
     public function payPublishDocument(Request $request)
     {
+        $req = \App\Models\Journal\Request::findOrFail($request->id);
+
         $request->validate([
             'reference_number' => ['required'],
             'receipt' => ['required', 'mimes:jpeg,jpg,png', 'max:2048'],
@@ -281,7 +305,7 @@ class ClientController extends Controller
         $file->storeAs('journal/receipts', $filename, 'public');
 
         $payment = Payment::create([
-            'request_id' => $request->id,
+            'request_id' => $req->id,
             'payment_method_id' => $request->payment_method_id,
         ]);
 

@@ -116,6 +116,7 @@ const Pending = () => {
       onSuccess: () => {
         handleOpen()
         toast.success('Request approved successfully.')
+        router.visit(route('admin.request.approved'))
       }
     })
   }
@@ -126,6 +127,7 @@ const Pending = () => {
       onSuccess: () => {
         handleOpen()
         toast.success('Request rejected successfully.')
+        router.visit(route('admin.request.rejected'))
       }
     })
   }
