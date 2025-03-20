@@ -113,7 +113,6 @@ class ClientController extends Controller
             'request_number' => $requestNumber,
             'uploaded_file' => $filename,
             'amount' => $service->price,
-            'commission_amount_rate' => $service->commission_price_rate ? $service->commission_price_rate : null
         ]);
     }
 

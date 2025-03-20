@@ -38,21 +38,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 
 const List = () => {
   const [open, setOpen] = useState(false)
   const { data, setData, post, processing, errors, reset, setError } = useForm({
     id: null,
     name: "",
-    price: "",
-    commission_price_rate: "none"
+    price: ""
   })
   const { services } = usePage().props
   const [search, setSearch] = useState("");
@@ -74,7 +66,6 @@ const List = () => {
         id: service.id,
         name: service.name,
         price: service.price,
-        commission_price_rate: service.commission_price_rate ? service.commission_price_rate : 'none'
       })
     } else {
       setEditData(false)
@@ -159,7 +150,6 @@ const List = () => {
               <TableHead>#</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Price</TableHead>
-              <TableHead>Commission Rate</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
@@ -176,9 +166,6 @@ const List = () => {
                   </TableCell>
                   <TableCell>
                     {formatCurrency(service.price)}
-                  </TableCell>
-                  <TableCell>
-                    {service.commission_price_rate ? service.commission_price_rate : '0'}%
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center space-x-2">
@@ -247,29 +234,10 @@ const List = () => {
               <Input value={data.name} onChange={(e) => setData('name', e.target.value)} />
               <InputError message={errors.name} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label>Price</Label>
-                <Input type="number" value={data.price} onChange={(e) => setData('price', e.target.value)} />
-                <InputError message={errors.price} />
-              </div>
-              <div className="space-y-1">
-                <Label>Commission Rate</Label>
-                <Select value={data.commission_price_rate} onValueChange={(val) => setData('commission_price_rate', val)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">0%</SelectItem>
-                    <SelectItem value="5">5%</SelectItem>
-                    <SelectItem value="10">10%</SelectItem>
-                    <SelectItem value="15">15%</SelectItem>
-                    <SelectItem value="20">20%</SelectItem>
-                    <SelectItem value="25">25%</SelectItem>
-                  </SelectContent>
-                </Select>
-                <InputError message={errors.commission_price_rate} />
-              </div>
+            <div className="space-y-1">
+              <Label>Price</Label>
+              <Input type="number" value={data.price} onChange={(e) => setData('price', e.target.value)} />
+              <InputError message={errors.price} />
             </div>
           </div>
           <DialogFooter>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Journal;
 use App\Http\Controllers\Controller;
 use App\Models\Journal\AssignEditor;
 use App\Models\Journal\Commission;
+use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -89,6 +90,15 @@ class EditorController extends Controller
         $assign->update([
             'status' => $request->status
         ]);
+
+        if ($request->status === 'approved') {
+            $editor = User::findOrFail($assign->editor_id);
+
+            \App\Models\Journal\Request::find($request->id)
+                ->update([
+                    'commission_amount_rate' => $editor->commission_price_rate ? $editor->commission_price_rate : null
+                ]);
+        }
     }
 
     public function assignDocumentApproved(Request $request)

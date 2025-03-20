@@ -12,7 +12,6 @@ class Service extends Model
     protected $fillable = [
         'name',
         'price',
-        'commission_price_rate',
         'status',
     ];
 

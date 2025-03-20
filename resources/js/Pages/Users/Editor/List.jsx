@@ -37,18 +37,50 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { FilePenLine, Settings2, UserCircle } from "lucide-react";
 
 const List = () => {
   const [open, setOpen] = useState(false)
   const { data, setData, post, processing, errors, reset, setError } = useForm({
+    id: null,
     last_name: "",
     first_name: "",
     middle_name: "",
     gender: "",
-    email: ""
+    email: "",
+    commission_price_rate: null,
   })
   const { editors } = usePage().props
   const [search, setSearch] = useState("");
+  const [openCommission, setOpenCommission] = useState(false)
+
+  const handleOpenCommission = (editor) => {
+    if (editor) {
+      setData({
+        id: editor.id,
+        commission_price_rate: editor.commission_price_rate ? editor.commission_price_rate : null
+      })
+    } else {
+      reset()
+    }
+    setOpenCommission(!openCommission)
+  }
+
+  const handleUpdateCommission = () => {
+    post(route('admin.user.update.editor.commission'), {
+      onSuccess: () => {
+        handleOpenCommission()
+      },
+    });
+  }
 
   const handleOpen = () => {
     setOpen(!open)
@@ -112,6 +144,8 @@ const List = () => {
               <TableHead>First Name</TableHead>
               <TableHead>Email Address</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Commission Rate</TableHead>
+              <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -135,11 +169,33 @@ const List = () => {
                       <span className='capitalize'>{editor.status}</span>
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    {editor.commission_price_rate ? editor.commission_price_rate : '0'}%
+                  </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <Settings2 />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem className="cursor-pointer">
+                          <UserCircle />Show Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleOpenCommission(editor)} className="cursor-pointer">
+                          <FilePenLine />Edit Commission Rate
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>
@@ -203,10 +259,47 @@ const List = () => {
               <Input type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} />
               <InputError message={errors.email} />
             </div>
+            <div className="space-y-1">
+              <Label>Commission Rate (%)</Label>
+              <Input
+                value={data.commission_price_rate}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/\D/g, '')
+                  if (value.length > 2) value = value.slice(0, 2)
+                  setData('commission_price_rate', value);
+                }}
+              />
+              <InputError message={errors.commission_price_rate} />
+            </div>
           </div>
           <DialogFooter>
             <Button onClick={handleAdd} disabled={processing}>
               Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={openCommission} onOpenChange={() => setOpenCommission()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Commission Rate</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-1">
+            <Label>Commission Rate (%)</Label>
+            <Input
+              value={data.commission_price_rate}
+              onChange={(e) => {
+                let value = e.target.value.replace(/\D/g, '')
+                if (value.length > 2) value = value.slice(0, 2)
+                setData('commission_price_rate', value);
+              }}
+            />
+            <InputError message={errors.commission_price_rate} />
+          </div>
+          <DialogFooter>
+            <Button onClick={handleUpdateCommission} disabled={processing}>
+              Update
             </Button>
           </DialogFooter>
         </DialogContent>

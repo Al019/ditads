@@ -43,6 +43,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'role',
         'status',
         'is_default',
+        'commission_price_rate',
     ];
 
     /**

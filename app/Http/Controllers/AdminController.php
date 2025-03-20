@@ -143,7 +143,7 @@ class AdminController extends Controller
     {
         $search = $request->input('search');
 
-        $editors = User::select('id', 'first_name', 'last_name', 'email', 'status')
+        $editors = User::select('id', 'first_name', 'last_name', 'email', 'status', 'commission_price_rate')
             ->where('role', 'editor')
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
@@ -179,9 +179,18 @@ class AdminController extends Controller
             'email_verified_at' => now(),
             'password' => Hash::make($password),
             'role' => 'editor',
+            'commission_price_rate' => $request->commission_price_rate ? $request->commission_price_rate : null
         ]);
 
         Mail::to($request->email)->send(new PasswordMail($password, $request->first_name . ' ' . $request->last_name));
+    }
+
+    public function updateEditorCommission(Request $request)
+    {
+        User::findOrFail($request->id)
+            ->update([
+                'commission_price_rate' => $request->commission_price_rate ? $request->commission_price_rate : null
+            ]);
     }
 
     public function getClient(Request $request)

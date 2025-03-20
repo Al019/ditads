@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->decimal('price');
-            $table->string('commission_price_rate')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
         });

@@ -27,6 +27,7 @@ return new class extends Migration
             $table->enum('role', ['admin', 'enumerator', 'viewer', 'editor', 'client'])->default('client');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->boolean('is_default')->default(0);
+            $table->string('commission_price_rate')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

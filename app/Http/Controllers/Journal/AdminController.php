@@ -22,11 +22,12 @@ class AdminController extends Controller
     {
         $search = $request->input('search');
 
-        $services = Service::when($search, function ($query) use ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', '%' . $search . '%');
-            });
-        })
+        $services = Service::select('id', 'name', 'price', 'status')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                });
+            })
             ->latest()
             ->paginate(10);
 
@@ -45,7 +46,6 @@ class AdminController extends Controller
         Service::create([
             'name' => $request->name,
             'price' => $request->price,
-            'commission_price_rate' => $request->commission_price_rate === 'none' ? null : $request->commission_price_rate
         ]);
     }
 
@@ -59,7 +59,6 @@ class AdminController extends Controller
         Service::where('id', $request->id)->update([
             'name' => $request->name,
             'price' => $request->price,
-            'commission_price_rate' => $request->commission_price_rate === 'none' ? null : $request->commission_price_rate
         ]);
     }
 
