@@ -1,5 +1,4 @@
 import { AppSidebar } from "@/components/app-sidebar"
-import { ModeToggle } from "@/Components/mode-toggle"
 import { useSecurity } from "@/Components/security-modal"
 import { Button } from "@/Components/ui/button"
 import { Separator } from "@/components/ui/separator"
@@ -14,12 +13,9 @@ import { useEffect, useState } from "react"
 import {
     Sheet,
     SheetContent,
-    SheetDescription,
     SheetHeader,
     SheetTitle,
-    SheetTrigger,
 } from "@/components/ui/sheet"
-import axios from "axios"
 
 export default function AuthenticatedLayout({ children, title, button, tab }) {
     const user = usePage().props.auth.user;

@@ -14,11 +14,8 @@ import { router } from "@inertiajs/react"
 import {
   ChevronRight,
   FileInputIcon,
-  FileUp,
   FolderSync,
-  Layers,
   LayoutDashboard,
-  NotebookPen,
 } from "lucide-react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./ui/collapsible";
 

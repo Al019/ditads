@@ -3,20 +3,15 @@
 namespace App\Http\Controllers\Journal;
 
 use App\Http\Controllers\Controller;
-use App\Models\Journal\AssignEditor;
-use App\Models\Journal\Commission;
-use App\Models\Journal\Notification;
 use App\Models\Journal\Payment;
 use App\Models\Journal\PaymentMethod;
 use App\Models\Journal\Receipt;
 use App\Models\Journal\Service;
-use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Storage;
 use Str;
-use function Laravel\Prompts\select;
 
 class ClientController extends Controller
 {

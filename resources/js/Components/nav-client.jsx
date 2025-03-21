@@ -15,7 +15,6 @@ import {
   ChevronRight,
   ClipboardList,
   FolderSync,
-  Layers,
   LayoutDashboard,
   Loader,
   NotebookPen,

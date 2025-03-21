@@ -21,7 +21,6 @@ import {
   ClipboardList,
   FolderCog,
   FolderSync,
-  Layers,
   LayoutDashboard,
   NotebookPen,
   UserPen,

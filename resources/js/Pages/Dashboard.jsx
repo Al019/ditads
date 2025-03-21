@@ -2,13 +2,10 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout"
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { FolderSync, NotebookPen, Users, TrendingUp } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { FolderSync, NotebookPen, Users } from "lucide-react"
 import { usePage } from "@inertiajs/react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import {

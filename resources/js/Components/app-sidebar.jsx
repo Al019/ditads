@@ -9,10 +9,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { Link, usePage } from "@inertiajs/react"
+import { usePage } from "@inertiajs/react"
 import Logo from '../../../public/images/logo.png'
 import { NavAdmin } from "./nav-admin"
-import { NavEnumerator } from "./nav-enumerator"
 import { NavClient } from "./nav-client"
 import NavEditor from "./nav-editor"
 import { ModeToggle } from "./mode-toggle"
