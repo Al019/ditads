@@ -16,15 +16,11 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-        $enumerator = User::where('role', 'enumerator')
-            ->count();
-        $viewer = User::where('role', 'viewer')
-            ->count();
         $editor = User::where('role', 'editor')
             ->count();
         $client = User::where('role', 'client')
             ->count();
-        $userCount = [$enumerator, $viewer, $editor, $client];
+        $userCount = [$editor, $client];
 
         $pendingRequest = \App\Models\Journal\Request::where('status', 'pending')
             ->count();

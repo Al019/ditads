@@ -49,9 +49,6 @@ export function AppSidebar({
       {user.role === 'admin' && (
         <NavAdmin />
       )}
-      {user.role === 'enumerator' && (
-        <NavEnumerator />
-      )}
       {user.role === 'client' && (
         <NavClient />
       )}

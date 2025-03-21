@@ -59,22 +59,6 @@ export function NavAdmin() {
               <CollapsibleContent>
                 <SidebarMenuSub>
                   <SidebarMenuSubItem onClick={() => {
-                    router.visit(route('admin.user.enumerator'))
-                    setOpenMobile(false)
-                  }} className="cursor-pointer">
-                    <SidebarMenuSubButton asChild isActive={location.pathname.startsWith('/admin/users/enumerators') ? true : false}>
-                      <span>Enumerators</span>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                  <SidebarMenuSubItem onClick={() => {
-                    router.visit(route('admin.user.viewer'))
-                    setOpenMobile(false)
-                  }} className="cursor-pointer">
-                    <SidebarMenuSubButton asChild isActive={location.pathname.startsWith('/admin/users/viewers') ? true : false}>
-                      <span>Viewers</span>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                  <SidebarMenuSubItem onClick={() => {
                     router.visit(route('admin.user.editor'))
                     setOpenMobile(false)
                   }} className="cursor-pointer">
@@ -94,22 +78,6 @@ export function NavAdmin() {
               </CollapsibleContent>
             </SidebarMenuItem>
           </Collapsible>
-        </SidebarMenu>
-      </SidebarGroup>
-      <SidebarGroup>
-        <SidebarGroupLabel>
-          Survey
-        </SidebarGroupLabel>
-        <SidebarMenu>
-          <SidebarMenuItem onClick={() => {
-            router.visit(route('admin.survey'))
-            setOpenMobile(false)
-          }}>
-            <SidebarMenuButton tooltip="Surveys" isActive={location.pathname.startsWith('/admin/surveys') ? true : false}>
-              <Layers />
-              <span>Surveys</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
       <SidebarGroup>
