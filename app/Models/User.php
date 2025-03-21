@@ -69,21 +69,6 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function survey(): HasMany
-    {
-        return $this->hasMany(Survey::class, 'admin_id');
-    }
-
-    public function response(): HasMany
-    {
-        return $this->hasMany(Response::class, 'enumerator_id');
-    }
-
-    public function survey_assignment(): HasMany
-    {
-        return $this->hasMany(SurveyAssignment::class, 'enumerator_id');
-    }
-
     public function request(): HasMany
     {
         return $this->hasMany(Request::class, 'client_id');

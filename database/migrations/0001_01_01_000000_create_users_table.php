@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('course')->nullable();
             $table->string('school')->nullable();
             $table->enum('school_type', ['public', 'private'])->nullable();
-            $table->enum('role', ['admin', 'enumerator', 'viewer', 'editor', 'client'])->default('client');
+            $table->enum('role', ['admin','editor','client'])->default('client');
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->boolean('is_default')->default(0);
             $table->string('commission_price_rate')->nullable();

@@ -9,10 +9,6 @@ Route::get('/', function () {
         return redirect(route('login'));
     } else if (Auth::user()->role === 'admin') {
         return redirect(route('admin.dashboard'));
-    } else if (Auth::user()->role === 'enumerator') {
-        return redirect(route('enumerator.dashboard'));
-    } else if (Auth::user()->role === 'viewer') {
-        return redirect(route('viewer.dashboard'));
     } else if (Auth::user()->role === 'editor') {
         return redirect(route('editor.dashboard'));
     } else if (Auth::user()->role === 'client') {
@@ -31,12 +27,6 @@ Route::middleware(['auth', 'admin', 'verified'])->group(function () {
 
     Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
-    Route::get('/admin/users/enumerators', [AdminController::class, 'getEnumerator'])->name('admin.user.enumerator');
-    Route::post('/admin/users/enumerators', [AdminController::class, 'addEnumerator'])->name('admin.user.add.enumerator');
-
-    Route::get('/admin/users/viewers', [AdminController::class, 'getViewer'])->name('admin.user.viewer');
-    Route::post('/admin/users/viewers', [AdminController::class, 'addViewer'])->name('admin.user.add.viewer');
-
     Route::get('/admin/users/editors', [AdminController::class, 'getEditor'])->name('admin.user.editor');
     Route::post('/admin/users/editors', [AdminController::class, 'addEditor'])->name('admin.user.add.editor');
     Route::post('/admin/users/editors/update/commission', [AdminController::class, 'updateEditorCommission'])->name('admin.user.update.editor.commission');
@@ -46,7 +36,5 @@ Route::middleware(['auth', 'admin', 'verified'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
-
-require __DIR__ . '/survey.php';
 
 require __DIR__ . '/journal.php';

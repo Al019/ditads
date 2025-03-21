@@ -11,7 +11,7 @@ import { SecurityProvider } from './Components/security-modal';
 const appName = import.meta.env.VITE_APP_NAME;
 
 createInertiaApp({
-    title: () => appName,
+    title: () => `${appName} - Journal`,
     resolve: (name) =>
         resolvePageComponent(
             `./Pages/${name}.jsx`,
