@@ -8,6 +8,8 @@ use App\Models\Journal\Payment;
 use App\Models\Journal\PaymentMethod;
 use App\Models\Journal\Receipt;
 use App\Models\Journal\Service;
+use App\Models\Notification;
+use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -119,6 +121,15 @@ class ClientController extends Controller
             'request_number' => $requestNumber,
             'uploaded_file' => $filename,
             'amount' => $service->price,
+        ]);
+
+        $admin_id = User::where('role', 'admin')->first()->id;
+
+        Notification::create([
+            'user_id' => $admin_id,
+            'message' => $request->user()->first_name . ' ' . $request->user()->last_name . ' ' . 'has submitted a request',
+            'type' => 'request',
+            'status' => 'pending',
         ]);
     }
 
@@ -319,6 +330,15 @@ class ClientController extends Controller
             'reference_number' => $request->reference_number,
             'receipt_image' => $filename,
         ]);
+
+        $admin_id = User::where('role', 'admin')->first()->id;
+
+        Notification::create([
+            'user_id' => $admin_id,
+            'message' => $request->user()->first_name . ' ' . $request->user()->last_name . ' ' . 'has pay for request #' . $req->request_number,
+            'type' => 'payment',
+            'status' => 'pending',
+        ]);
     }
 
     public function repayPublishDocument(Request $request)
@@ -345,6 +365,15 @@ class ClientController extends Controller
             'payment_id' => $payment->id,
             'reference_number' => $request->reference_number,
             'receipt_image' => $filename,
+        ]);
+
+        $admin_id = User::where('role', 'admin')->first()->id;
+
+        Notification::create([
+            'user_id' => $admin_id,
+            'message' => $request->user()->first_name . ' ' . $request->user()->last_name . ' ' . 'has repay for request #' . $request->request_number,
+            'type' => 'payment',
+            'status' => 'pending',
         ]);
     }
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Journal;
 
 use App\Http\Controllers\Controller;
 use App\Models\Journal\AssignEditor;
+use App\Models\Notification;
+use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -82,6 +84,25 @@ class EditorController extends Controller
         $assign->update([
             'status' => $request->status
         ]);
+
+        $admin_id = User::where('role', 'admin')->first()->id;
+
+        Notification::create([
+            'user_id' => $admin_id,
+            'message' => $request->user()->first_name . ' ' . $request->user()->last_name . ' ' . 'has' . ' ' . $request->status . ' ' . 'the assigned document',
+            'type' => 'assign',
+            'status' => $request->status,
+        ]);
+
+        if ($request->status === 'approved') {
+            $req = \App\Models\Journal\Request::find($assign->request_id);
+
+            Notification::create([
+                'user_id' => $req->client_id,
+                'message' => $request->user()->first_name . ' ' . $request->user()->last_name . ' ' . 'is working on editing your document' . ' ' . '(' . basename($req->uploaded_file) . ')',
+                'type' => 'progress',
+            ]);
+        }
     }
 
     public function assignDocumentApproved(Request $request)
@@ -231,6 +252,22 @@ class EditorController extends Controller
         $assign->update([
             'published_file' => $filename,
             'published_at' => Carbon::now()->setTimezone('Asia/Manila'),
+        ]);
+
+        $admin_id = User::where('role', 'admin')->first()->id;
+
+        $req = \App\Models\Journal\Request::find($assign->request_id);
+
+        Notification::create([
+            'user_id' => $admin_id,
+            'message' => $request->user()->first_name . ' ' . $request->user()->last_name . ' ' . 'has published the document' . ' ' . '(' . $file->getClientOriginalName() . ')',
+            'type' => 'publish',
+        ]);
+
+        Notification::create([
+            'user_id' => $req->client_id,
+            'message' => $request->user()->first_name . ' ' . $request->user()->last_name . ' ' . 'has published the document' . ' ' . '(' . $file->getClientOriginalName() . ')',
+            'type' => 'publish',
         ]);
     }
 

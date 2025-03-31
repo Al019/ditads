@@ -65,6 +65,7 @@ const navMain = [
 const NavEditor = () => {
   const { setOpenMobile } = useSidebar();
   const isMobile = useIsMobile();
+  const currentPath = window.location.pathname;
 
   return (
     <SidebarContent>
@@ -78,7 +79,7 @@ const NavEditor = () => {
               setOpenMobile(false)
             }
           }}>
-            <SidebarMenuButton tooltip="Dashboard" asChild isActive={location.pathname.startsWith('/editor/dashboard') ? true : false}>
+            <SidebarMenuButton tooltip="Dashboard" asChild isActive={currentPath.startsWith('/editor/dashboard') ? true : false}>
               <Link href={route('editor.dashboard')}>
                 <LayoutDashboard />
                 <span>Dashboard</span>
@@ -86,7 +87,7 @@ const NavEditor = () => {
             </SidebarMenuButton>
           </SidebarMenuItem>
           {navMain.map((item, index) => (
-            <Collapsible key={index} asChild className="group/collapsible" defaultOpen={location.pathname.startsWith(item.path) ? true : false}>
+            <Collapsible key={index} asChild className="group/collapsible" defaultOpen={currentPath.startsWith(item.path) ? true : false}>
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton tooltip={item.title}>
@@ -103,7 +104,7 @@ const NavEditor = () => {
                           setOpenMobile(false)
                         }
                       }} className="cursor-pointer">
-                        <SidebarMenuSubButton asChild isActive={location.pathname.startsWith(subItem.path) ? true : false}>
+                        <SidebarMenuSubButton asChild isActive={currentPath.startsWith(subItem.path) ? true : false}>
                           <Link href={route(subItem.route)}>
                             <span>{subItem.title}</span>
                           </Link>

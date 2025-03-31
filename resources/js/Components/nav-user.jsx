@@ -3,7 +3,7 @@
 import {
   ChevronsUpDown,
   LogOut,
-  User,
+  Settings,
 } from "lucide-react"
 import {
   Avatar,
@@ -73,9 +73,9 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => router.visit(route('profile.information'))} className="cursor-pointer">
-                <User />
-                My Profile
+              <DropdownMenuItem onClick={() => router.visit(route('setting.profile'))} className="cursor-pointer">
+                <Settings />
+                Settings
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

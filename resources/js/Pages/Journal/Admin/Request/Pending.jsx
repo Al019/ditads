@@ -116,7 +116,6 @@ const Pending = () => {
       onSuccess: () => {
         handleOpen()
         toast.success('Request rejected successfully.')
-        router.visit(route('admin.request.rejected'))
       }
     })
   }

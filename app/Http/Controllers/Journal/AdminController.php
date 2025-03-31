@@ -8,6 +8,7 @@ use App\Models\Journal\Payment;
 use App\Models\Journal\PaymentMethod;
 use App\Models\Journal\Receipt;
 use App\Models\Journal\Service;
+use App\Models\Notification;
 use App\Models\User;
 use DB;
 use Illuminate\Http\Request;
@@ -246,6 +247,20 @@ class AdminController extends Controller
             'editor_id' => $request->editor_id,
             'edited_file' => $filename
         ]);
+
+        Notification::create([
+            'user_id' => $req->client_id,
+            'message' => 'Your request #' . $req->request_number . ' ' . 'has been approved',
+            'type' => 'request',
+            'status' => 'approved',
+        ]);
+
+        Notification::create([
+            'user_id' => $request->editor_id,
+            'message' => 'You have been assigned a document',
+            'type' => 'assign',
+            'status' => 'pending',
+        ]);
     }
 
     public function rejectedRequest(Request $request)
@@ -259,6 +274,13 @@ class AdminController extends Controller
         $req->update([
             'message' => $request->message,
             'status' => $request->status
+        ]);
+
+        Notification::create([
+            'user_id' => $req->client_id,
+            'message' => 'Your request #' . $req->request_number . ' has been rejected',
+            'type' => 'request',
+            'status' => 'rejected',
         ]);
     }
 
@@ -395,6 +417,13 @@ class AdminController extends Controller
                 'editor_id' => $request->editor_id,
                 'status' => 'pending'
             ]);
+
+        Notification::create([
+            'user_id' => $request->editor_id,
+            'message' => 'You have been assigned a document',
+            'type' => 'assign',
+            'status' => 'pending',
+        ]);
     }
 
     public function assignEditorApproved(Request $request)
@@ -559,6 +588,15 @@ class AdminController extends Controller
             'payment_id' => $payment->id,
             'reference_number' => $request->reference_number,
         ]);
+
+        $req = \App\Models\Journal\Request::find($request->request_id);
+
+        Notification::create([
+            'user_id' => $req->client_id,
+            'message' => 'Your request #' . $req->request_number . ' ' . 'has been paid in cash',
+            'type' => 'payment',
+            'status' => 'approved',
+        ]);
     }
 
     public function publishDocumentPaid(Request $request)
@@ -680,9 +718,18 @@ class AdminController extends Controller
             abort(404);
         }
 
+        $req = \App\Models\Journal\Request::find($request->id);
+
         if ($request->status === 'approved') {
             $payment->update([
                 'status' => $request->status
+            ]);
+
+            Notification::create([
+                'user_id' => $req->client_id,
+                'message' => 'Your request #' . $req->request_number . ' ' . 'has been approved for payment',
+                'type' => 'payment',
+                'status' => 'approved',
             ]);
         } else if ($request->status === 'rejected') {
             $request->validate([
@@ -692,6 +739,13 @@ class AdminController extends Controller
             $payment->update([
                 'message' => $request->message,
                 'status' => $request->status
+            ]);
+
+            Notification::create([
+                'user_id' => $req->client_id,
+                'message' => 'Your request #' . $req->request_number . ' ' . 'has been rejected for payment',
+                'type' => 'payment',
+                'status' => 'rejected',
             ]);
         }
     }

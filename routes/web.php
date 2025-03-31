@@ -1,13 +1,21 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\WebController;
+use App\Models\Notification;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'information'])->name('profile.information');
-    Route::post('/profile', [ProfileController::class, 'changePassword'])->name('profile.change.password');
+
+    Route::get('/settings/profile', [SettingController::class, 'profile'])->name('setting.profile');
+    Route::get('/settings/password', [SettingController::class, 'password'])->name('setting.password');
+    Route::post('/settings/password/update', [SettingController::class, 'updatePassword'])->name('setting.password.update');
+
+    Route::get('/notifications', [NotificationController::class, 'getNotification'])->name('notification');
+    Route::post('/notifications/read', [NotificationController::class, 'readNotification'])->name('notification.read');
+
 });
 
 Route::middleware(['auth', 'admin', 'verified'])->group(function () {

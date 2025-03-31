@@ -8,14 +8,19 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 
-class ProfileController extends Controller
+class SettingController extends Controller
 {
-    public function information()
+    public function profile()
     {
-        return Inertia::render("Profile/Information");
+        return Inertia::render("Settings/Profile");
     }
 
-    public function changePassword(Request $request)
+    public function password()
+    {
+        return Inertia::render("Settings/Password");
+    }
+
+    public function updatePassword(Request $request)
     {
         $user_id = auth()->user()->id;
 

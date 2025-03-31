@@ -56,6 +56,7 @@ const Rejected = () => {
   const [message, setMessage] = useState("")
   const { data, errors, processing, setData, post, reset, clearErrors } = useForm({
     payment_id: null,
+    request_number: "",
     reference_number: "",
     receipt: null
   })
@@ -82,10 +83,13 @@ const Rejected = () => {
     setOpenShow(!openShow)
   }
 
-  const handleOpenRepay = (payment_id, payment_method) => {
-    if (payment_id || payment_method) {
-      setData('payment_id', payment_id)
-      setPayment(payment_method)
+  const handleOpenRepay = (request) => {
+    if (request) {
+      setData({
+        payment_id: request.payment.id,
+        request_number: request.request_number
+      })
+      setPayment(request.payment.payment_method)
     } else {
       reset()
       setPayment(null)
@@ -186,7 +190,7 @@ const Rejected = () => {
                         <DropdownMenuItem onClick={() => handleOpen(request.payment.message)} className="cursor-pointer">
                           <MessageSquareMore />Show Message
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleOpenRepay(request.payment.id, request.payment.payment_method)} className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpenRepay(request)} className="cursor-pointer">
                           <HandCoins />Repay
                         </DropdownMenuItem>
                       </DropdownMenuContent>

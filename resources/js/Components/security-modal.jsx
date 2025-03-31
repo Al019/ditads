@@ -31,7 +31,7 @@ export const SecurityProvider = ({ children }) => {
               <AlertDialogDescription>
                 Please change your password!
               </AlertDialogDescription>
-              <Button onClick={() => router.visit(route('profile.information'))} className="w-full">
+              <Button onClick={() => router.visit(route('setting.password'))} className="w-full">
                 Change Password
               </Button>
             </div>

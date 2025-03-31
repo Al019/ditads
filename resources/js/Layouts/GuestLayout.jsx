@@ -1,35 +1,25 @@
-import { Card } from "@/Components/ui/card";
 import { Link } from "@inertiajs/react";
-import { ModeToggle } from "@/Components/mode-toggle";
-import { Label } from "@/Components/ui/label";
 import AppLogo from "@/Components/app-logo";
 
-export default function GuestLayout({ children }) {
+export default function GuestLayout({ children, title, description }) {
     return (
-        <div className='min-h-screen flex items-center justify-center sm:p-6'>
-            <Card className="w-full max-w-4xl max-sm:rounded-none">
-                <div className="grid grid-cols-2 items-center max-md:p-6 md:grid-cols-1">
-                    <Link href='/' className="flex items-center gap-2 md:hidden">
-                        <AppLogo className="size-14" />
-                        <Label className="font-bold text-lg">DITADS</Label>
-                    </Link>
-                    <div className="flex justify-end md:px-6 md:pt-6">
-                        <ModeToggle />
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 md:min-h-[500px] max-md:grid-cols-1">
-                    <div className="flex items-center justify-center">
-                        <div className="w-full sm:max-w-sm">
-                            {children}
+        <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+            <div className="w-full max-w-sm">
+                <div className="flex flex-col gap-8">
+                    <div className="flex flex-col items-center gap-4">
+                        <Link href={route('welcome')} className="flex flex-col items-center gap-2 font-medium">
+                            <div className="mb-1 flex size-20 items-center justify-center">
+                                <AppLogo />
+                            </div>
+                        </Link>
+                        <div className="space-y-2 text-center">
+                            <h1 className="text-xl font-medium">{title}</h1>
+                            <p className="text-muted-foreground text-center text-sm">{description}</p>
                         </div>
                     </div>
-                    <div className="flex items-center justify-center max-md:hidden">
-                        <Link href='/'>
-                            <AppLogo className="size-72" />
-                        </Link>
-                    </div>
+                    {children}
                 </div>
-            </Card>
+            </div>
         </div>
     );
 }
