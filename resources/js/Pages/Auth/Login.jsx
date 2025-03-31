@@ -26,7 +26,7 @@ export default function Login({ status, canResetPassword }) {
     };
 
     return (
-        <GuestLayout title="Log in to your account" description="Enter your email and password below to log in">
+        <GuestLayout title="Log in to your account" description="Enter your email and password below to log in.">
             <form onSubmit={handleLogin} className="space-y-6">
                 <div className="space-y-4">
                     {status && (
@@ -65,7 +65,7 @@ export default function Login({ status, canResetPassword }) {
                 <div className="text-muted-foreground text-center text-sm">
                     Don't have an account?{' '}
                     <Link href={route('register')} className="hover:underline">
-                        Sign up
+                        Register
                     </Link>
                 </div>
             </form>

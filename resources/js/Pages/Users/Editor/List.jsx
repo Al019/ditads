@@ -155,7 +155,7 @@ const List = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="cursor-pointer">
+                        <DropdownMenuItem onClick={() => router.visit(route('user.profile', { id: editor.id }))} className="cursor-pointer">
                           <UserCircle />Show Profile
                         </DropdownMenuItem>
                       </DropdownMenuContent>

@@ -19,7 +19,7 @@ export default function ForgotPassword({ status }) {
     };
 
     return (
-        <GuestLayout title="Forgot password" description="Enter your email to receive a password reset link">
+        <GuestLayout title="Forgot password" description="Enter your email to receive a password reset link.">
             <form onSubmit={handleSend} className="space-y-6">
                 <div className="space-y-4">
                     {status && (

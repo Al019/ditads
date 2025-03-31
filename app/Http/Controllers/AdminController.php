@@ -117,4 +117,13 @@ class AdminController extends Controller
             "clients" => $clients,
         ]);
     }
+
+    public function getUserProfile($id)
+    {
+        $information = User::findOrFail($id);
+
+        return Inertia::render("Users/Profile", [
+            "information" => $information
+        ]);
+    }
 }

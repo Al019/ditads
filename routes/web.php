@@ -4,7 +4,6 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\WebController;
-use App\Models\Notification;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -15,6 +14,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/notifications', [NotificationController::class, 'getNotification'])->name('notification');
     Route::post('/notifications/read', [NotificationController::class, 'readNotification'])->name('notification.read');
+
+    Route::get('/users/profile/{id}', [AdminController::class, 'getUserProfile'])->name('user.profile');
 
 });
 

@@ -18,29 +18,27 @@ const SettingLayout = ({ children }) => {
   const currentPath = window.location.pathname;
 
   return (
-    <AuthenticatedLayout title="Settings">
-      <div className="flex max-lg:flex-col gap-4">
-        <div className="w-full max-w-[250px] flex lg:flex-col gap-1">
-          {settingItems.map((item, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              asChild
-              className={cn('w-full justify-start', {
-                'bg-muted': currentPath === item.href,
-              })}
-            >
-              <Link href={item.href} prefetch>
-                {item.title}
-              </Link>
-            </Button>
-          ))}
-        </div>
-        <div className="w-full max-w-2xl mx-auto">
-          {children}
-        </div>
+    <div className="flex max-lg:flex-col gap-4">
+      <div className="w-full max-w-[250px] flex lg:flex-col gap-1">
+        {settingItems.map((item, index) => (
+          <Button
+            key={index}
+            variant="ghost"
+            asChild
+            className={cn('w-full justify-start', {
+              'bg-muted': currentPath === item.href,
+            })}
+          >
+            <Link href={item.href}>
+              {item.title}
+            </Link>
+          </Button>
+        ))}
       </div>
-    </AuthenticatedLayout>
+      <div className="w-full max-w-2xl mx-auto">
+        {children}
+      </div>
+    </div>
   )
 }
 

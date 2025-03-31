@@ -21,7 +21,7 @@ export default function ResetPassword({ token, email }) {
     };
 
     return (
-        <GuestLayout title="Reset password" description="Please enter your new password below">
+        <GuestLayout title="Reset password" description="Please enter your new password below.">
             <form onSubmit={handleReset} className='space-y-6'>
                 <div className='space-y-4'>
                     <div className="space-y-1">

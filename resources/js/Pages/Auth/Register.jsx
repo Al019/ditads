@@ -23,7 +23,7 @@ export default function Register() {
     };
 
     return (
-        <GuestLayout title="Create an account" description="Enter your details below to create your account">
+        <GuestLayout title="Register an account" description="Enter your details below to create your account.">
             <form onSubmit={handleRegister} className="space-y-6">
                 <div className="space-y-4">
                     <div className="grid sm:grid-cols-2 gap-4">

@@ -18,6 +18,9 @@ import {
   PaginationPrevious,
 } from "@/Components/ui/pagination"
 import { Badge } from "@/Components/ui/badge"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/Components/ui/dropdown-menu";
+import { Button } from "@/Components/ui/button";
+import { Settings2, UserCircle } from "lucide-react";
 
 const List = () => {
   const { clients } = usePage().props
@@ -64,6 +67,7 @@ const List = () => {
               <TableHead>First Name</TableHead>
               <TableHead>Email Address</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -87,11 +91,26 @@ const List = () => {
                       <span className='capitalize'>{client.status}</span>
                     </Badge>
                   </TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <Settings2 />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => router.visit(route('user.profile', { id: client.id }))} className="cursor-pointer">
+                          <UserCircle />Show Profile
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   {search ? `No matching found for "${search}"` : "No data available."}
                 </TableCell>
               </TableRow>

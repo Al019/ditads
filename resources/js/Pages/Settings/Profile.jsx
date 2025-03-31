@@ -1,5 +1,6 @@
 import { Input } from '@/Components/ui/input'
 import { Label } from '@/Components/ui/label'
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import SettingLayout from '@/Layouts/SettingLayout'
 import { usePage } from '@inertiajs/react';
 
@@ -15,7 +16,7 @@ const Profile = () => {
         <div className='grid sm:grid-cols-2 gap-4'>
           <div className="space-y-1">
             <Label>Last name</Label>
-            <Input value={user.first_name} readOnly />
+            <Input value={user.last_name} readOnly />
           </div>
           <div className="space-y-1">
             <Label>First name</Label>
@@ -39,6 +40,10 @@ const Profile = () => {
   )
 }
 
-Profile.layout = page => <SettingLayout children={page} />
+Profile.layout = page => (
+  <AuthenticatedLayout title="Settings">
+    <SettingLayout children={page} />
+  </AuthenticatedLayout>
+)
 
 export default Profile

@@ -41,6 +41,9 @@ const WebLayout = ({ children }) => {
   const user = usePage().props.auth.user;
   const [open, setOpen] = useState(false)
   const appName = import.meta.env.VITE_APP_NAME;
+  const appEmail = import.meta.env.VITE_APP_EMAIL;
+  const appPhone = import.meta.env.VITE_APP_PHONE;
+  const appFacebook = import.meta.env.VITE_APP_FACEBOOK;
 
   return (
     <>
@@ -80,7 +83,7 @@ const WebLayout = ({ children }) => {
                   <>
                     <Link href={route('login')}>
                       <Button variant="ghost">
-                        Log In
+                        Log in
                       </Button>
                     </Link>
                     <Link href={route('register')}>
@@ -115,10 +118,10 @@ const WebLayout = ({ children }) => {
                 <h2 className="mb-6 text-sm font-semibold uppercase">Contact Us</h2>
                 <ul className="font-medium">
                   <li className="mb-4">
-                    <a href="#" className="hover:underline break-words">email@example.com</a>
+                    <a href={`mailto:${appEmail}`} className="hover:underline break-words">{appEmail}</a>
                   </li>
                   <li>
-                    <a href="#" className="hover:underline break-words">09123456789</a>
+                    <a href={`tel:${appPhone}`} className="hover:underline break-words">{appPhone}</a>
                   </li>
                 </ul>
               </div>
@@ -126,10 +129,7 @@ const WebLayout = ({ children }) => {
                 <h2 className="mb-6 text-sm font-semibold uppercase">Follow us</h2>
                 <ul className="font-medium">
                   <li className="mb-4">
-                    <a href="#" className="hover:underline break-words">Facebook</a>
-                  </li>
-                  <li>
-                    <a href="#" className="hover:underline break-words">Instagram</a>
+                    <a href={appFacebook} target="_blank" className="hover:underline break-words">Facebook</a>
                   </li>
                 </ul>
               </div>
@@ -174,7 +174,7 @@ const WebLayout = ({ children }) => {
               <div className="grid items-center grid-cols-2 gap-2">
                 <Link href={route('login')}>
                   <Button onClick={() => setOpen(false)} variant="ghost" className="w-full">
-                    Log In
+                    Log in
                   </Button>
                 </Link>
                 <Link href={route('register')}>

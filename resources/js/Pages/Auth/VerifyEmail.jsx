@@ -13,7 +13,7 @@ export default function VerifyEmail({ status }) {
     };
 
     return (
-        <GuestLayout title="Verify email" description="Please verify your email address by clicking on the link we just emailed to you">
+        <GuestLayout title="Verify email" description="Please verify your email address by clicking on the link we just emailed to you.">
             <form onSubmit={handleSend} className='space-y-6'>
                 {status === 'verification-link-sent' && (
                     <Alert className="border-primary">

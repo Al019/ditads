@@ -2,6 +2,7 @@ import InputError from '@/Components/input-error';
 import { InputPassword } from '@/Components/input-password';
 import { Button } from '@/Components/ui/button';
 import { Label } from '@/Components/ui/label';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import SettingLayout from '@/Layouts/SettingLayout'
 import { useForm, usePage } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
@@ -70,6 +71,10 @@ const Password = () => {
   )
 }
 
-Password.layout = page => <SettingLayout children={page} />
+Password.layout = page => (
+  <AuthenticatedLayout title="Settings">
+    <SettingLayout children={page} />
+  </AuthenticatedLayout>
+)
 
 export default Password
