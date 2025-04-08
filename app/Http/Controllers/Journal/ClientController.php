@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Journal;
 
+use App\Events\NotificationEvent;
 use App\Http\Controllers\Controller;
 use App\Models\Journal\AssignEditor;
 use App\Models\Journal\Payment;
@@ -123,14 +124,16 @@ class ClientController extends Controller
             'amount' => $service->price,
         ]);
 
-        $admin_id = User::where('role', 'admin')->first()->id;
+        $admin = User::where('role', 'admin')->first();
 
         Notification::create([
-            'user_id' => $admin_id,
+            'user_id' => $admin->id,
             'message' => $request->user()->first_name . ' ' . $request->user()->last_name . ' ' . 'has submitted a request',
             'type' => 'request',
             'status' => 'pending',
         ]);
+
+        broadcast(new NotificationEvent($admin->id));
     }
 
     public function resubmitRequest(Request $request)

@@ -118,9 +118,11 @@ class AdminController extends Controller
         ]);
     }
 
-    public function getUserProfile($id)
+    public function getUserProfile(Request $request)
     {
-        $information = User::findOrFail($id);
+        $information = User::where('id', $request->id)
+            ->whereNot('role', 'admin')
+            ->firstOrFail();
 
         return Inertia::render("Users/Profile", [
             "information" => $information

@@ -22,6 +22,7 @@ import {
   ClipboardList,
   FolderCog,
   FolderSync,
+  Layers,
   LayoutDashboard,
   NotebookPen,
   UserPen,
@@ -242,6 +243,25 @@ export function NavAdmin() {
               </SidebarMenuItem>
             </Collapsible>
           ))}
+        </SidebarMenu>
+      </SidebarGroup>
+      <SidebarGroup>
+        <SidebarGroupLabel>
+          Web
+        </SidebarGroupLabel>
+        <SidebarMenu>
+          <SidebarMenuItem onClick={() => {
+            if (isMobile) {
+              setOpenMobile(false)
+            }
+          }}>
+            <SidebarMenuButton tooltip="Research Journals" asChild isActive={currentPath.startsWith('/admin/web/research-journals') ? true : false}>
+              <Link href={route('admin.web.research.journal')}>
+                <Layers />
+                <span>Research Journals</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
     </SidebarContent>

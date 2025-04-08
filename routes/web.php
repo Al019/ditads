@@ -15,7 +15,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'getNotification'])->name('notification');
     Route::post('/notifications/read', [NotificationController::class, 'readNotification'])->name('notification.read');
 
-    Route::get('/users/profile/{id}', [AdminController::class, 'getUserProfile'])->name('user.profile');
+    Route::get('/users/profile', [AdminController::class, 'getUserProfile'])->name('user.profile');
 
 });
 
@@ -28,9 +28,13 @@ Route::middleware(['auth', 'admin', 'verified'])->group(function () {
 
     Route::get('/admin/users/clients', [AdminController::class, 'getClient'])->name('admin.user.client');
 
+    Route::get('/admin/web/research-journals', [WebController::class, 'getResearchJournal'])->name('admin.web.research.journal');
+    Route::post('/admin/web/research-journals/upload', [WebController::class, 'uploadResearchJournal'])->name('admin.web.research.journal.upload');
+
 });
 
 Route::get('/', [WebController::class, 'welcome'])->name('welcome');
+Route::get('/research-journals', [WebController::class, 'researchJournal'])->name('research.journal');
 
 require __DIR__ . '/auth.php';
 

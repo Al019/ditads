@@ -5,6 +5,7 @@ namespace App\Models\Journal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class AssignEditor extends Model
 {
@@ -27,5 +28,10 @@ class AssignEditor extends Model
     public function request(): BelongsTo
     {
         return $this->belongsTo(Request::class, 'request_id');
+    }
+
+    public function research_journal(): HasOne
+    {
+        return $this->hasOne(ResearchJournal::class, 'assign_editor_id');
     }
 }
